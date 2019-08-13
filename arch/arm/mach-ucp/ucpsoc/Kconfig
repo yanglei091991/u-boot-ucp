@@ -1,0 +1,21 @@
+if ARCH_UCP
+
+config UCPSOC
+	bool
+	default y
+
+choice
+	prompt "UCP board select"
+	optional
+
+config TARGET_UCP
+	bool "ucp"
+
+endchoice
+
+config SYS_SOC
+	default "ucpsoc"
+
+source "board/smart-logic/ucp/Kconfig"
+
+endif

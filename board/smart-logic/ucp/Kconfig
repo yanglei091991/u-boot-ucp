@@ -1,0 +1,12 @@
+if TARGET_UCP
+
+config SYS_BOARD
+	default "ucp"
+
+config SYS_VENDOR
+	default "smart-logic"
+
+config SYS_CONFIG_NAME
+	default "ucp_a53"
+
+endif
