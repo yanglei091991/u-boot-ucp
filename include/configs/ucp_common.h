@@ -27,6 +27,22 @@
 /* MMC */
 #define CONFIG_BOUNCE_BUFFER
 
+/*
+ * Ethernet
+ */
+#define CONFIG_DESIGNWARE_ETH
+#define CONFIG_UCP_GMAC_BASE 0x036a0000
+
+#define CONFIG_IPADDR    192.168.1.103
+#define CONFIG_NETMASK   255.255.255.0
+#define CONFIG_SERVERIP    192.168.1.105
+#define CONFIG_GATEWAYIP   192.168.1.1
+#define CONFIG_MII    /* expose smi ove miiphy interface */
+#define CONFIG_CMD_MII
+#define CONFIG_SYS_FAULT_ECHO_LINK_DOWN /* detect link using phy */
+#define CONFIG_PHY_ADDR 1
+#define CONFIG_DW_ALTDESCRIPTOR
+
 // yanglei
 #define IRAM_BASE_ADDR      			0x10000000
 #define IRAM_SIZE                       0x00100000
