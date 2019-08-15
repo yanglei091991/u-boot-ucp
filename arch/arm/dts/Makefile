@@ -555,6 +555,9 @@ dtb-$(CONFIG_TARGET_STM32MP1) += \
 
 dtb-$(CONFIG_SOC_K3_AM6) += k3-am654-base-board.dtb
 
+# UCP device tree
+dtb-$(CONFIG_TARGET_UCP) += ucp-board.dtb
+
 targets += $(dtb-y)
 
 # Add any required device tree compiler flags here
