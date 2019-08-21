@@ -3,12 +3,12 @@
 #include "skeleton.dtsi"
 
 / {
-    #address-cells = <1>;
-    #size-cells = <1>;
-    ethernet@36a0000 {
-    	compatible = "nvidia,tegra186-eqos";
-    	reg = <0x36a0000 0x20000>;
-        status = "okay";
-        phy-mode = "rgmii-id";
-    };
+  #address-cells = <1>;
+  #size-cells = <1>;
+	ethernet@36a0000 {
+		reg = <0x36a0000 0x20000>;
+		compatible = "nvidia,tegra186-eqos";
+  	status = "okay";
+  	phy-mode = "rgmii-id";
+	};
 };
