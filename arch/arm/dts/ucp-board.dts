@@ -6,9 +6,16 @@
   #address-cells = <1>;
   #size-cells = <1>;
 	ethernet@36a0000 {
-		reg = <0x36a0000 0x20000>;
 		compatible = "nvidia,tegra186-eqos";
+		reg = <0x36a0000 0x20000>;
   	status = "okay";
-  	phy-mode = "rgmii-id";
+  	phy-mode = "rgmii";
+    phy-handle = <&ethernet_phy>;
+    #address-cells = <1>;
+    #size-cells = <0>;
+    ethernet_phy: marvell_phy@0 {
+      compatible = "marvell,88E1518";
+      reg = <0>;
+    };
 	};
 };

@@ -79,11 +79,52 @@
 /* Size of malloc() pool */
 #define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 2 * 1024 * 1024)
 
+/*-----------------------------------------------------------------------
+ * Networking Configuration
+ */
+#define CONFIG_RGMII
+#define CONFIG_PHY_MARVELL
+#define CONFIG_SYS_RX_ETH_BUFFER	8
+#define CONFIG_NET_RETRY_COUNT		20
+#define CONFIG_ARP_TIMEOUT		500 /* millisec */
+
+#define CONFIG_CMD_MII
 
 #if 0
+/*
+ * BOOTP options
+ */
+#define CONFIG_BOOTP_BOOTFILESIZE
+#define CONFIG_BOOTP_BOOTPATH
+#define CONFIG_BOOTP_GATEWAY
+#define CONFIG_BOOTP_HOSTNAME
+
+ /*
+  * Handover flattened device tree (dtb file) to Linux kernel
+  */
+
+ 	"importbootenv= "					\
+ 		"env import -t -r ${uenvaddr} ${filesize};\0"	\
+ 								\
+	"tftploadenv=tftp ${uenvaddr} ${uenvfile} \0"		\
+	"tftploadscr=tftp ${uenvaddr} ${scriptfile} \0"		\
+	"tftploadub=tftp ${loadaddr} ${ubootfile} \0"		\
+								\
+	"mmcloadenv=fatload mmc 0 ${uenvaddr} ${uenvfile}\0"	\
+	"mmcloadscr=fatload mmc 0 ${uenvaddr} ${scriptfile}\0"	\
+	"mmcloadub=fatload mmc 0 ${loadaddr} ${ubootfile}\0"	\
+								\
+	"loadbootenv=run mmcloadenv\0"				\
+	"loadbootscr=run mmcloadscr\0"				\
+	"loadbootenv=run mmcloadenv || run tftploadenv\0"	\
+	"loadbootscr=run mmcloadscr || run tftploadscr\0"	\
+ 	"bootcmd_root= "					\
+ 		"if run loadbootenv; then "			\
+ 			"echo Loaded environment ${uenvfile}; "
+#endif
 
 
-#define CONFIG_ARP_TIMEOUT	200UL
+#if 0
 
 /* MMC Configs */
 #define CONFIG_SYS_FSL_ESDHC_ADDR	USDHC4_BASE_ADDR
