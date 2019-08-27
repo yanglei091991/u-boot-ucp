@@ -161,6 +161,14 @@
 #define EQOS_REG_BASE 0x036a0000
 
 
+void print_packet(unsigned length, char* packet) {
+    printf("length: %d ", length);
+    printf("content: ");
+    while (length--) {
+        printf("%x ", *(packet++));
+    }
+    printf("\n");
+}
 //++++
 struct eqos_mac_regs {
 	uint32_t configuration;				/* 0x000 */
@@ -260,7 +268,7 @@ void ucp_setbits_le32(u32 *reg, u32 mask)
 }
 void ucp_clrbits_le32(u32 *reg, u32 mask)
 {
-	u32 val = 0;
+	//u32 val = 0;
 	*(volatile u32 *)reg &= ~mask;
 
 }
@@ -418,6 +426,7 @@ static int eqos_set_half_duplex(struct udevice *dev)
 
 //++++
 //static int eqos_set_gmii_speed(void)
+#if 0
 static int eqos_set_gmii_speed(struct udevice *dev)
 {
 	struct eqos_priv *eqos= &g_eqos;
@@ -426,6 +435,7 @@ static int eqos_set_gmii_speed(struct udevice *dev)
 
 	return 0;
 }
+#endif
 
 //++++
 //static int eqos_set_mii_speed_100(void)
@@ -456,7 +466,7 @@ static int eqos_set_mii_speed_10(struct udevice *dev)
 static int eqos_set_tx_clk_speed_tegra186(void)
 {
 	ulong rate;
-	int ret;
+	//int ret;
 
 	struct phy_device *phydev = &g_phydev;
 
@@ -555,6 +565,7 @@ static int eqos_write_hwaddr(struct udevice *dev)
 //static int eqos_start(void)
 static int eqos_start(struct udevice *dev)
 {
+    printf("eqos_start...\n");
 	int ret, i;
 	ulong rate;
 	u32 val, tx_fifo_sz, rx_fifo_sz, tqs, rqs, pbl;
@@ -578,6 +589,14 @@ static int eqos_start(struct udevice *dev)
 	val = (rate / 1000000) - 1;
 	writel(val, &eqos->mac_regs->us_tic_counter);
 	
+#if 0
+	eqos->phy = phy_connect(eqos->mii, 0, dev, PHY_INTERFACE_MODE_RGMII);
+	if (!eqos->phy) {
+		pr_err("phy_connect() failed");
+		goto err_stop_resets;
+	}
+#endif
+
 	ret = ucp_phy_reset();
 	if (ret < 0) {
 		goto err;
@@ -811,6 +830,7 @@ err:
 
 void eqos_stop(struct udevice *dev)
 {
+    printf("eqos_stop...\n");
 }
 
 //++++
@@ -821,6 +841,8 @@ int eqos_send(struct udevice *dev, void *packet, int length)
 	int i;
 	struct eqos_priv *eqos= &g_eqos;
 
+    printf("eqos_send start...");
+    print_packet(length, (char*)packet);
 	memcpy(eqos->tx_dma_buf, packet, length);
 
 	tx_desc = &(eqos->tx_descs[eqos->tx_desc_idx]);
@@ -843,7 +865,8 @@ int eqos_send(struct udevice *dev, void *packet, int length)
 			return 0;
 		udelay(1);
 	}
-
+    printf("eqos_send finished...");
+    print_packet(length, (char*)packet);
 
 	return -ETIMEDOUT;
 }
@@ -852,6 +875,7 @@ int eqos_send(struct udevice *dev, void *packet, int length)
 //int eqos_recv(int flags, uchar **packetp)
 int eqos_recv(struct udevice *dev, int flags, uchar **packetp)
 {
+    printf("eqos_recv start...");
 	struct eqos_desc *rx_desc;
 	int length;
 	struct eqos_priv *eqos= &g_eqos;
@@ -865,6 +889,8 @@ int eqos_recv(struct udevice *dev, int flags, uchar **packetp)
 		(eqos->rx_desc_idx * EQOS_MAX_PACKET_SIZE);
 	length = rx_desc->des3 & 0x7fff;
 
+    printf("eqos_recv finished...");
+    print_packet(length, (char*)(*(char**)packetp));
 	return length;
 }
 
@@ -875,6 +901,9 @@ int eqos_free_pkt(struct udevice *dev, uchar *packet, int length)
 	uchar *packet_expected;
 	struct eqos_desc *rx_desc;
 	struct eqos_priv *eqos= &g_eqos;
+
+    printf("eqos_free start...");
+    print_packet(length, (char*)(*(char**)packet));
 
 	packet_expected = eqos->rx_dma_buf +
 		(eqos->rx_desc_idx * EQOS_MAX_PACKET_SIZE);
@@ -896,6 +925,8 @@ int eqos_free_pkt(struct udevice *dev, uchar *packet, int length)
 
 	eqos->rx_desc_idx++;
 	eqos->rx_desc_idx %= EQOS_DESCRIPTORS_RX;
+    printf("eqos_free finished...");
+    print_packet(length, (char*)(*(char**)packet));
 
 	return 0;
 }
@@ -904,7 +935,8 @@ int eqos_free_pkt(struct udevice *dev, uchar *packet, int length)
 //static int eqos_probe_resources_core(void)
 static int eqos_probe_resources_core(struct udevice *dev)
 {
-	int ret;
+    printf("eqos_probe_resources_core...\n");
+	//int ret;
 	struct eqos_priv *eqos= &g_eqos;
 
 	eqos->descs = eqos_alloc_descs(0);
@@ -924,6 +956,7 @@ static int eqos_probe_resources_core(struct udevice *dev)
 //static int eqos_init(void)
 static int eqos_probe(struct udevice *dev)
 {
+    printf("eqos_probe...\n");
 	int ret;
 	struct eqos_priv *eqos= &g_eqos;
 
@@ -945,6 +978,7 @@ static int eqos_probe(struct udevice *dev)
 
 static int eqos_remove(struct udevice *dev)
 {
+  return 0;
 }
 
 static const struct eth_ops eqos_ops = {

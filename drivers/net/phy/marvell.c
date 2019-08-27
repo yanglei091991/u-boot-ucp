@@ -116,8 +116,9 @@
 
 
 
-struct phy_device g_phydev={0};
-
+struct phy_device g_phydev={
+.interface = PHY_INTERFACE_MODE_RGMII
+};
 extern void udelay(unsigned long usec);
 
 extern void mdelay(unsigned long msec);
