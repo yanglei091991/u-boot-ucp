@@ -12,12 +12,12 @@
 #include <miiphy.h>
 #include <netdev.h>
 #include <asm/arch-armv7/systimer.h>
-
+#include <asm/mach-types.h>
 DECLARE_GLOBAL_DATA_PTR;
 #define CONFIG_SYS_TIMER_COUNTER 0x031d0004
 static struct systimer *systimer_base = (struct systimer *)0x031d0000;
 
- void mapu_timer_init(void)
+ void ucp_timer_init(void)
 {
 	/*
 	 * Set Timer0 to be:
@@ -27,15 +27,27 @@ static struct systimer *systimer_base = (struct systimer *)0x031d0000;
 	writel(5, &systimer_base->timer0control);
 }
 
+int dram_init_banksize(void)
+{
+	gd->bd->bi_dram[0].start = CONFIG_SYS_SDRAM_BASE;
+	gd->bd->bi_dram[0].size =
+			get_ram_size((long *)CONFIG_SYS_SDRAM_BASE, PHYS_SDRAM_SIZE);
+    return 0;
+}
 
 int dram_init(void)
 {
+	gd->ram_size =
+		get_ram_size((long *)CONFIG_SYS_SDRAM_BASE, PHYS_SDRAM_SIZE);
+//    dram_init_banksize();
 	return 0;
 }
 
 int board_init(void)
 {
+
+	gd->bd->bi_arch_number = MACH_TYPE_UCP;
 //    ucp_ddr_init();
-	mapu_timer_init();
+	ucp_timer_init();
 	return 0;
 }

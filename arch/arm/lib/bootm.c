@@ -396,6 +396,7 @@ static void boot_jump_linux(bootm_headers_t *images, int flag)
 							  0, machid, r2);
 		} else
 #endif
+            printf("kernel entry");
 			kernel_entry(0, machid, r2);
 	}
 #endif
@@ -414,6 +415,7 @@ int do_bootm_linux(int flag, int argc, char * const argv[],
 	if (flag & BOOTM_STATE_OS_BD_T || flag & BOOTM_STATE_OS_CMDLINE)
 		return -1;
 
+//    images->lmb.memory.region[0].size = 0x20000000;
 	if (flag & BOOTM_STATE_OS_PREP) {
 		boot_prep_linux(images);
 		return 0;

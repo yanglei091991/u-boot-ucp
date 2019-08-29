@@ -1,26 +1,27 @@
 #ifndef __CONFIG_H
 #define __CONFIG_H
 
-#define CONFIG_SKIP_LOWLEVEL_INIT
 #define CONFIG_BOARD_POSTCLK_INIT
 
-#define CONFIG_SYS_BOOTM_LEN	0x1000000
+#define CONFIG_SYS_BOOTM_LEN	(64<<20)
+#define CONFIG_SYS_BOOTMAPSZ    0x10000000
+#define CONFIG_SYS_BOOT_GET_CMDLINE
+#define CONFIG_SYS_BOOT_GET_KBD
 
 #include <linux/sizes.h>
 #define CONFIG_SYS_TIMER_COUNTER 0x031d0004
 #define CONFIG_SYS_TIMER_COUNTS_DOWN
 
-//#define CONFIG_SYS_DCACHE_OFF
-//#define CONFIG_SYS_ICACHE_OFF
-#define CONFIG_SYS_CACHELINE_SIZE	64
-//???
-//#define CONFIG_STANDALONE_LOAD_ADDR 0x60080000
+#define CONFIG_SYS_DCACHE_OFF
+#define CONFIG_SYS_ICACHE_OFF
+#define CONFIG_SYS_L2CACHE_OFF
 
 /* Boot options */
 //???
-#define CONFIG_LOADADDR		0x40000000
+//#define CONFIG_LOADADDR		0x40000000
+
 //???
-#define CONFIG_SYS_LOAD_ADDR	CONFIG_LOADADDR
+#define CONFIG_SYS_LOAD_ADDR	0x20000000
 
 /* allow to overwrite serial and ethaddr */
 //???
@@ -36,8 +37,8 @@
 #define CONFIG_BOUNCE_BUFFER
 
 // yanglei
-#define IRAM_BASE_ADDR      			0x10000000
-#define IRAM_SIZE                       0x00100000
+//#define IRAM_BASE_ADDR      			0x10000000
+//#define IRAM_SIZE                       0x04000000
 //#define ROMCP_ARB_BASE_ADDR             0x00000000
 //#define ROMCP_ARB_END_ADDR              0x000FFFFF
 
@@ -63,25 +64,30 @@
 
 /* Physical Memory Map */
 
-#define CONFIG_SYS_SDRAM_BASE		0x20000000
-#define PHYS_SDRAM_SIZE             (0x4FFFFFFF - CONFIG_SYS_SDRAM_BASE)
+#define UCP_DDR_BASE                0x14000000
+#define CONFIG_SYS_SDRAM_BASE		UCP_DDR_BASE
+#define PHYS_SDRAM_SIZE             (0x40000000 - 0x4000000)
 //#define PHYS_SDRAM_SIZE             (0x7FFFFFFF - CONFIG_SYS_SDRAM_BASE)
-#define CONFIG_SYS_INIT_RAM_ADDR	IRAM_BASE_ADDR
-#define CONFIG_SYS_INIT_RAM_SIZE	IRAM_SIZE
+//#define CONFIG_SYS_INIT_RAM_ADDR	IRAM_BASE_ADDR
+#define CONFIG_SYS_INIT_RAM_SIZE	0x100000
+#define CONFIG_SYS_INIT_SP_OFFSET   (CONFIG_SYS_INIT_RAM_SIZE - GENERATED_GBL_DATA_SIZE)
+#define CONFIG_SYS_INIT_SP_ADDR		(UCP_DDR_BASE + CONFIG_SYS_INIT_SP_OFFSET)
 
-#define CONFIG_SYS_INIT_SP_OFFSET \
-	(CONFIG_SYS_INIT_RAM_SIZE - GENERATED_GBL_DATA_SIZE)
-#define CONFIG_SYS_INIT_SP_ADDR \
-	(CONFIG_SYS_INIT_RAM_ADDR + CONFIG_SYS_INIT_SP_OFFSET)
+#define CONFIG_SYS_MEMTEST_START	UCP_DDR_BASE
+#define CONFIG_SYS_MEMTEST_END	    (UCP_DDR_BASE + PHYS_SDRAM_SIZE)
+
 
 /* Environment organization */
+//#define CONFIG_ENV_IS_IN_FLASH		0
 #define CONFIG_ENV_OFFSET		(6 * 64 * 1024)
 #define CONFIG_ENV_SIZE			(8 * 1024)
 //#define CONFIG_SYS_MMC_ENV_DEV		1
 
 /* Size of malloc() pool */
-#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 2 * 1024 * 1024)
+#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 20 * 1024 * 1024)
 
+
+#define CONFIG_CMDLINE_EDITING		1
 /*-----------------------------------------------------------------------
  * Networking Configuration
  */
@@ -89,21 +95,17 @@
 #define CONFIG_PHY_MARVELL
 #define CONFIG_SYS_RX_ETH_BUFFER	8
 #define CONFIG_NET_RETRY_COUNT		20
-#define CONFIG_ARP_TIMEOUT		500 /* millisec */
+#define CONFIG_ARP_TIMEOUT		200 /* millisec */
 
-/*
- * Ethernet
- */
-//#define CONFIG_MAPU_GMAC_BASE 0x036a0000
-#define CONFIG_IPADDR    169.254.21.201
-#define CONFIG_NETMASK   255.255.255.0
-#define CONFIG_SERVERIP   169.254.21.176
-#define CONFIG_GATEWAYIP   169.254.21.176
-#define CONFIG_MII    /* expose smi ove miiphy interface */
 #define CONFIG_CMD_MII
-#define CONFIG_SYS_FAULT_ECHO_LINK_DOWN /* detect link using phy */
-#define CONFIG_PHY_ADDR 1
-#define CONFIG_DW_ALTDESCRIPTOR
+
+#define MEM_LAYOUT_ENV_SETTINGS \
+	"bootm_size=0x20000000\0" \
+    "bootm_low=0x30000000\0"
+
+#define CONFIG_EXTRA_ENV_SETTINGS \
+	MEM_LAYOUT_ENV_SETTINGS \
+    "bootargs console=ttyS0,115200n8 rdinit=/linuxrc"
 
 #if 0
 /*

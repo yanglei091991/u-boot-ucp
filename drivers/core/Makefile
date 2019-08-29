@@ -16,5 +16,5 @@ endif
 obj-$(CONFIG_OF_CONTROL) += of_extra.o ofnode.o read_extra.o
 
 ccflags-$(CONFIG_DM_DEBUG) += -DDEBUG
-CFLAGS_uclass.o = -O2
-CFLAGS_ofnode.o = -O2
+#CFLAGS_uclass.o = -O2
+#CFLAGS_ofnode.o = -O2
