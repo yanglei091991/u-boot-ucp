@@ -67,6 +67,8 @@
 #define UCP_DDR_BASE                0x14000000
 #define CONFIG_SYS_SDRAM_BASE		UCP_DDR_BASE
 #define PHYS_SDRAM_SIZE             (0x40000000 - 0x4000000)
+#define CONFIG_SYS_DRAM_SIZE        (0x40000000 - 0x4000000)
+#define CONFIG_SYS_SDRAM_SIZE        (0x40000000 - 0x4000000)
 //#define PHYS_SDRAM_SIZE             (0x7FFFFFFF - CONFIG_SYS_SDRAM_BASE)
 //#define CONFIG_SYS_INIT_RAM_ADDR	IRAM_BASE_ADDR
 #define CONFIG_SYS_INIT_RAM_SIZE	0x100000
@@ -105,7 +107,11 @@
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	MEM_LAYOUT_ENV_SETTINGS \
-    "bootargs console=ttyS0,115200n8 rdinit=/linuxrc"
+    "bootargs=console=ttyS0,115200n8 rdinit=/linuxrc\0"
+
+//#define CONFIG_NR_DRAM_BANKS		1
+#define PHYS_SDRAM_1				UCP_DDR_BASE
+#define PHYS_SDRAM_1_SIZE		(0x10000000 * 4)
 
 #if 0
 /*

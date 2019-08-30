@@ -29,23 +29,23 @@ static struct systimer *systimer_base = (struct systimer *)0x031d0000;
 
 int dram_init_banksize(void)
 {
-	gd->bd->bi_dram[0].start = CONFIG_SYS_SDRAM_BASE;
+	gd->bd->bi_dram[0].start = PHYS_SDRAM_1;
 	gd->bd->bi_dram[0].size =
-			get_ram_size((long *)CONFIG_SYS_SDRAM_BASE, PHYS_SDRAM_SIZE);
+			get_ram_size((long *)PHYS_SDRAM_1, PHYS_SDRAM_1_SIZE);
     return 0;
 }
 
 int dram_init(void)
 {
 	gd->ram_size =
-		get_ram_size((long *)CONFIG_SYS_SDRAM_BASE, PHYS_SDRAM_SIZE);
-//    dram_init_banksize();
+		get_ram_size((long *)PHYS_SDRAM_1, PHYS_SDRAM_1_SIZE);
+    dram_init_banksize();
 	return 0;
 }
 
 int board_init(void)
 {
-
+	gd->bd->bi_boot_params = PHYS_SDRAM_1+ 0xb000000;
 	gd->bd->bi_arch_number = MACH_TYPE_UCP;
 //    ucp_ddr_init();
 	ucp_timer_init();

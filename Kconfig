@@ -106,7 +106,7 @@ config ENV_VARS_UBOOT_CONFIG
 
 config NR_DRAM_BANKS
 	int "Number of DRAM banks"
-	default 4
+	default 1
 	help
 	  This defines the number of DRAM banks.
 
