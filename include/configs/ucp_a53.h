@@ -90,6 +90,19 @@
 
 
 #define CONFIG_CMDLINE_EDITING		1
+/*
+ * Ethernet
+ */
+//#define CONFIG_MAPU_GMAC_BASE 0x036a0000
+#define CONFIG_IPADDR    169.254.21.201
+#define CONFIG_NETMASK   255.255.255.0
+#define CONFIG_SERVERIP   169.254.21.176
+#define CONFIG_GATEWAYIP   169.254.21.176
+#define CONFIG_MII    /* expose smi ove miiphy interface */
+#define CONFIG_CMD_MII
+#define CONFIG_SYS_FAULT_ECHO_LINK_DOWN /* detect link using phy */
+#define CONFIG_PHY_ADDR 1
+#define CONFIG_DW_ALTDESCRIPTOR
 /*-----------------------------------------------------------------------
  * Networking Configuration
  */
@@ -98,8 +111,6 @@
 #define CONFIG_SYS_RX_ETH_BUFFER	8
 #define CONFIG_NET_RETRY_COUNT		20
 #define CONFIG_ARP_TIMEOUT		200 /* millisec */
-
-#define CONFIG_CMD_MII
 
 #define MEM_LAYOUT_ENV_SETTINGS \
 	"bootm_size=0x20000000\0" \
