@@ -13,6 +13,9 @@
 #include <netdev.h>
 #include <asm/arch-armv7/systimer.h>
 #include <asm/mach-types.h>
+#define _READ_INTERFACE
+#include "copy_image.h"
+
 DECLARE_GLOBAL_DATA_PTR;
 #define CONFIG_SYS_TIMER_COUNTER 0x031d0004
 static struct systimer *systimer_base = (struct systimer *)0x031d0000;
@@ -49,5 +52,20 @@ int board_init(void)
 	gd->bd->bi_arch_number = MACH_TYPE_UCP;
 //    ucp_ddr_init();
 	ucp_timer_init();
+
+//	unsigned int *src = (unsigned int*)(int)(2048*6); // nand flash image addr
+//	unsigned char *dest = (unsigned char*)0x20000000; // ddr image addr
+//
+//	if(copy_image_dts_to_ram(src, dest) == false)
+//	{
+//	return false;  
+//	}
+//	src = (unsigned int*)(int)(2048*7); // nand flash dts addr
+//	dest = (unsigned char*)0x28000000; // ddr dts addr
+//	if(copy_image_dts_to_ram(src, dest) == false)
+//	{
+//	return false;  
+//	}
+
 	return 0;
 }
