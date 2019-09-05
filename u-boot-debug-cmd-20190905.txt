@@ -1,0 +1,30 @@
+setenv bootargs console=ttyS0,115200n8 rdinit=/linuxrc
+bootm 0x20000000 - 0x28000000
+bootm 0x20000000 0x24000000 0x28000000
+
+bootm 0x30000000 - 0x38000000
+restore "F:\ucp_boot2\fpga\uImage" binary S:0x20000000
+restore "F:\ucp_boot2\fpga\ramdisk.img" binary S:0x24000000
+restore "F:\ucp_boot2\fpga\ucp.dtb" binary S:0x28000000
+
+
+symbol-file F:\ucp_boot2\ucpsave\linux-5.1.smdkc210.O0\vmlinux   
+
+restore "F:\ucp_boot2\fpga\u-boot.bin" binary S:0x4ee0000
+
+restore "F:\ucp_boot2\ucpsave\linux-5.1.smdkc210.O0\vmlinux" binary S:0x40000000
+symbol-file F:\ucp_boot2\u-boot-2018.11-rc2\u-boot  ((gd_t*)($r9))->reloc_off
+symbol-file F:\ucp_boot2\ucpsave\linux-5.1.smdkc210.O0\vmlinux
+
+symbol-file F:\ucp_boot2\ucpsave\linux-5.1.smdkc210.O0\vmlinux 0x220b202c-0xc0b0c578
+
+#b relocate_code
+#c
+#b 0x11000ba4-0x11000b54+relocate_code
+#c
+#wait 1000
+symbol-file F:\ucp_boot2\u-boot-2018.11-rc2\u-boot  ((gd_t*)($r9))->reloc_off
+
+restore "F:\ucp_boot2\fpga\uImage" binary S:0x30000000
+restore "F:\ucp_boot2\fpga\ucp.dtb" binary S:0x38000000
+c
