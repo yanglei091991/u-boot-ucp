@@ -886,16 +886,16 @@ struct phy_device *phy_connect(struct mii_dev *bus, int addr,
 #endif
 {
 	struct phy_device *phydev = NULL;
-	int sn; 
 #ifdef CONFIG_PHY_FIXED
-	int sn = 0; // phy_index
+	int sn;
 	const char *name;
+
 	sn = fdt_first_subnode(gd->fdt_blob, dev_of_offset(dev));
 	while (sn > 0) {
 		name = fdt_get_name(gd->fdt_blob, sn, NULL);
 		if (name && strcmp(name, "fixed-link") == 0) {
 			phydev = phy_device_create(bus,
-						   sn, phy_fixed_id, interface);
+						   sn, PHY_FIXED_ID, interface);
 			break;
 		}
 		sn = fdt_next_subnode(gd->fdt_blob, sn);

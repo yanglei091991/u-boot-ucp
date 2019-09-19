@@ -112,11 +112,12 @@
 #define CONFIG_PHY_MARVELL
 #define CONFIG_SYS_RX_ETH_BUFFER	8
 #define CONFIG_NET_RETRY_COUNT		20
-#define CONFIG_ARP_TIMEOUT		200 /* millisec */
+#define CONFIG_ARP_TIMEOUT		5000 /* millisec */
 
 #define MEM_LAYOUT_ENV_SETTINGS \
 	"bootm_size=0x20000000\0" \
-    "bootm_low=0x30000000\0"
+    "bootm_low=0x30000000\0" \
+    "ethaddr=b2:77:62:76:f9:ee\0"
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	MEM_LAYOUT_ENV_SETTINGS \
@@ -125,6 +126,12 @@
 //#define CONFIG_NR_DRAM_BANKS		1
 #define PHYS_SDRAM_1				UCP_DDR_BASE
 #define PHYS_SDRAM_1_SIZE		(0x10000000 * 2)
+
+//#define CONFIG_FS_EXT4
+//#define CONFIG_EXT4_WRITE
+//#define CONFIG_CMD_EXT4
+//#define CONFIG_CMD_EXT4_WRITE
+#define CONFIG_CMD_FS_GENERIC
 
 #if 0
 /*

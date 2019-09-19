@@ -25,7 +25,7 @@ void __attribute__((weak)) reset_cpu(ulong addr)
 ulong get_tbclk(void)
 {
   //return 0;
-  return  25000000;
+  return  50000000;// timer
 }
 
 int board_postclk_init(void)
