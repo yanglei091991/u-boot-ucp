@@ -37,14 +37,10 @@ struct phy_device {
 	u32 flags;
 };
 
-
-extern void udelay(unsigned long usec);
-void mdelay(unsigned long msec);
 int phy_reset(void);
 int m88e1518_config(void);
 int m88e1011s_startup(void);
 int eqos_mdio_read(int mdio_addr, int mdio_reg);
 int eqos_mdio_write(int mdio_addr,int mdio_reg, u16 mdio_val);
-
 
 #endif

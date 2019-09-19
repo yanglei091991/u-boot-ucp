@@ -9,7 +9,7 @@
 #include "mdio.h"
 #include "mii.h"
 #include "errno.h"
-
+#include <common.h>
 
 #define PHY_ANEG_TIMEOUT	8000	/* PHY needs a longer aneg time */
 
