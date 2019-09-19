@@ -1,0 +1,5 @@
+config UCP_ETH
+	bool "UCP Ethernet driver"
+	help
+	  This driver provides support for UCP Ethernet.
+

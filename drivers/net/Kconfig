@@ -472,4 +472,6 @@ config TSEC_ENET
 	  This driver implements support for the (Enhanced) Three-Speed
 	  Ethernet Controller found on Freescale SoCs.
 
+source "drivers/net/ucp_eth/Kconfig"
+
 endif # NETDEVICES
