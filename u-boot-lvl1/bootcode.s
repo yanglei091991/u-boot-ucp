@@ -28,17 +28,70 @@ bootcode:
                 mov     r12, #0
                 mov     r14, #0
 
-                // Initialize the stack pointer
-                ldr     r13, =stack_top
-                add     r13, r13, #4
-                mrc     p15, 0, r0, c0, c0, 5   // MPIDR
-                and     r0, r0, #0xff           // r0 == CPU number
-                mov     r2, #CPU_STACK_SIZE
-                mul     r1, r0, r2
-                sub     r13, r13, r1
+                // -----------------------------------------------------------------------------
+                // Variable definitions
+                // -----------------------------------------------------------------------------
+                
+                // Values to set I and F bits in cpsr register
+                .equ I_BIT                   , 0x80
+                .equ F_BIT                   , 0x40
+                // Values for different modes in cpsr register
+                .equ MODE_IRQ                , 0x12
+                .equ MODE_ABT                , 0x17
+                .equ MODE_UND                , 0x1b
+                .equ MODE_SYS                , 0x1f
 
+
+                ldr     r0, =stack_top         // stack_top imported from space allocated in stackheap.S
+                mrc     p15, 0, r1, c0, c0, 5
+                and     r1, r1, #0xff          // r1 = CPU number
+                mov     r2, #(CPU_STACK_SIZE)
+                mul     r1, r1, r2             // CPU_STACK_SIZE x cpu number
+
+//               Use Cluster No to calculate stack pointer
+                mrc     p15, 0, r2, c0, c0, 5
+                and     r2, r2, #0xFF00          // mask bits of cluster number
+                asr     r2, r2, #8               // r2 = Cluster number
+                mov     r3, #(CLUSTER_STACK_SIZE)// r3 = Total stack needed for cluster
+                mul     r2, r3, r2               // Cluster num X cluster stack size
+
+                add     r1, r1, r2               // prev cluster mem + prev cpu mem
+                sub     r0, r0, r1               // subtract offset for all clusters and cpus before
+
+
+//                // Initialize the stack pointer
+//                ldr     r13, =stack_top
+//                add     r13, r13, #4
+//                mrc     p15, 0, r0, c0, c0, 5   // MPIDR
+//                and     r0, r0, #0xff           // r0 == CPU number
+//                mov     r2, #CPU_STACK_SIZE
+//                mul     r1, r0, r2
+//                sub     r13, r13, r1
+
+
+//               Exception stack pointers
+
+//               Enter each mode in turn and initialise stack pointer
+//               CPSR_c used to avoid altering condition codes
+                msr CPSR_c, #MODE_IRQ|I_BIT|F_BIT
+                mov     r13, r0
+                sub     r0, r0, #EXCEPTION_STACK_SIZE
+                msr CPSR_c, #MODE_ABT|I_BIT|F_BIT
+                mov     r13, r0
+                sub     r0, r0, #EXCEPTION_STACK_SIZE
+                msr CPSR_c, #MODE_UND|I_BIT|F_BIT
+                mov     r13, r0
+                sub     r0, r0, #EXCEPTION_STACK_SIZE
+                msr CPSR_c, #MODE_SYS|I_BIT|F_BIT
+                mov     r13, r0
+
+// -----------------------------------------------------------------------------
+// Ensure all writes to system registers have taken place
+// -----------------------------------------------------------------------------
+                dsb sy
+                isb sy
                 // Enable interrupts
-                cpsie   if
+                cpsie   ifa
 
                 .ifdef IK_MODE
                 // All CPUs start the test code. The select_cpu function in the integration kit
@@ -49,12 +102,22 @@ bootcode:
                 // in individual tests where required.
                 mrc     p15, 0, r0, c0, c0, 5   // Read MPIDR
                 ands    r0, r0, #0xFF           // r0 == CPU number
-                beq     cpu_start
+                cmp     r0, #1                  // cpu1 run
+                beq     cpu1_jump
+                // cpu1 wakeup start
+//                ldr r1, =0x03670060
+//                ldr r1, [r1]
+//                mov r2, #2
+//                orr r1, r1, r2
+//                ldr r3, =0x03670060
+//                str r1, [r3]
+                // cpu1 wakeup end
+                b     cpu_start
                 .endif
 
                 // If the CPU is not CPU0 then enter WFI
-wfi_loop:       wfi
-                b       wfi_loop
+//wfi_loop:       wfi
+//                b       wfi_loop
 
 
 //-------------------------------------------------------------------------------
@@ -67,12 +130,28 @@ wfi_loop:       wfi
                 // assember test.  Weakly import the labels for each and to
                 // determine the correct one.  Note that the linker translates
                 // any branches to non-existant weakly-imported labels to NOPs.
+                
+//                mov r0, #0
+//                ldr r1, =#100000
+//timer_loop:
+//                add r0, r0, #1 
+//                cmp r0, r1
+//                bne timer_loop
+//my_loop:
+//                b my_loop
+
+cpu1_jump:
+                ldr r0, =0x1100
+                ldr r1, =0x020cfa00
+                str r0, [r1]
+                ldr r0, [r1] 
+                bx r0                
+
 cpu_start:
 				// boot_level_1 code relocation
-				ldr r0, =0x020c0000 
+				ldr r0, =0x020c0000
 				ldr r1, =bootcode 
 				ldr r2, _bss_start_ofs
-
 copy_loop:
 				ldr r3, [r1], #4
 				str r3, [r0], #4
@@ -130,7 +209,7 @@ run_on_ram:
 				/* jump to _arm_start */
 //				mov	pc, lr
 start_boot2:
-                ldr r0, =0x4ee0000 /*boot2 entry point*/
+                ldr r0, =0x04e60000 /*boot2 entry point*/
                 mov lr, r0
                 mov pc, lr          /* jump to boot2 */
 
@@ -153,7 +232,6 @@ _dynsym_start_ofs:
 .global _bss_start_ofs
 _bss_start_ofs:
 				.word __bss_start__ - bootcode
-
 
 				.end
 				

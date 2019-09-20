@@ -25,6 +25,7 @@
 #include "gpio.h"
 #include "common.h"
 //#include "crc16_test.h"
+#include "ddr_test.h"
 
 extern char __bss_start__[], __bss_end__[];
 extern void __libc_init_array(void);
@@ -34,20 +35,27 @@ void copy_data_to_ram(unsigned char *src,
                       unsigned char *dest, unsigned int len)
 {
   memcpy(dest,src,(size_t)len);
-  /*int i = 0;*/
-  /*for (; i < len; i++)*/
-  /*{*/
-    /**dest = *src;*/
-    /*dest++;*/
-    /*src++;*/
-  /*}*/
 }
 
+//void write_to_ram(unsigned int *dest, unsigned int len)
+//{
+//  int i = 0;
+//  for (; i < len; i++)
+//  {
+//    *dest = 0xffffffff;
+//    dest++;
+//  }
+//}
 //volatile char read_arr_index = 1;
 //unsigned char (* nandflash_read_arr[])(unsigned int,unsigned int,unsigned char*,unsigned int) = {nandflash_read, nandflash_read};
 
 int main()
 {
+//    int val = ddr_test();
+//    if(val != 0)
+//        return 1;
+//        printf("ddr write and read err");
+
   extern unsigned char data_load_start[];
   extern unsigned char __data_start[];
   extern unsigned int  data_size[];

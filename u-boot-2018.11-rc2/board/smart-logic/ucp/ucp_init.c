@@ -92,11 +92,13 @@ int board_mmc_init(bd_t *bis)
 	memset(host, 0, sizeof(struct dwmci_host));
 	host->name = "Synopsys Mobile storage";
 	host->ioaddr = (void *)SDIO_BASE;
-	host->buswidth = 4;
+	host->buswidth = 1;
 	host->dev_index = 0;
-	host->bus_hz = 50000000;
+    host->fifo_mode = 0;
+    host->fifoth_val = MSIZE(0x2) | RX_WMARK(0x100 / 2 - 1) | TX_WMARK(0x100 / 2);
+    host->bus_hz = 50000000;
 //	host->bus_hz = 4000000;
-
+    
 //	add_dwmci(host, host->bus_hz, 400000);
 	add_dwmci(host, 1000000, 400000);
 //    printf("400k Hz!\n");
