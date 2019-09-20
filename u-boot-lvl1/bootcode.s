@@ -141,9 +141,9 @@ bootcode:
 //                b my_loop
 
 cpu1_jump:
-                ldr r0, =0x1100
-                ldr r1, =0x020cfa00
-                str r0, [r1]
+//                ldr r0, =0x1100
+                ldr r1, =0x03690058
+//                str r0, [r1]
                 ldr r0, [r1] 
                 bx r0                
 
