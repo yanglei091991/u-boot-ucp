@@ -2653,6 +2653,7 @@ Finish:
 	return r;
 }
 
+#if CONFIG_XATTR_ENABLE
 int ext4_setxattr(const char *path, const char *name, size_t name_len,
 		  const void *data, size_t data_size)
 {
@@ -2879,6 +2880,7 @@ Finish:
 	return r;
 
 }
+#endif
 
 /*********************************DIRECTORY OPERATION************************/
 
