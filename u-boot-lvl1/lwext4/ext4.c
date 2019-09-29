@@ -547,47 +547,6 @@ static int ext4_path_check(const char *path, bool *is_goal)
 	return 0;
 }
 
-static bool ext4_parse_flags(const char *flags, uint32_t *file_flags)
-{
-	if (!flags)
-		return false;
-
-	if (!strcmp(flags, "r") || !strcmp(flags, "rb")) {
-		*file_flags = O_RDONLY;
-		return true;
-	}
-
-	if (!strcmp(flags, "w") || !strcmp(flags, "wb")) {
-		*file_flags = O_WRONLY | O_CREAT | O_TRUNC;
-		return true;
-	}
-
-	if (!strcmp(flags, "a") || !strcmp(flags, "ab")) {
-		*file_flags = O_WRONLY | O_CREAT | O_APPEND;
-		return true;
-	}
-
-	if (!strcmp(flags, "r+") || !strcmp(flags, "rb+") ||
-	    !strcmp(flags, "r+b")) {
-		*file_flags = O_RDWR;
-		return true;
-	}
-
-	if (!strcmp(flags, "w+") || !strcmp(flags, "wb+") ||
-	    !strcmp(flags, "w+b")) {
-		*file_flags = O_RDWR | O_CREAT | O_TRUNC;
-		return true;
-	}
-
-	if (!strcmp(flags, "a+") || !strcmp(flags, "ab+") ||
-	    !strcmp(flags, "a+b")) {
-		*file_flags = O_RDWR | O_CREAT | O_APPEND;
-		return true;
-	}
-
-	return false;
-}
-
 static int ext4_trunc_inode(struct ext4_mountpoint *mp,
 			    uint32_t index, uint64_t new_size)
 {
@@ -836,39 +795,6 @@ static int ext4_generic_open2(ext4_file *f, const char *path, int flags,
 }
 
 /****************************************************************************/
-
-static int ext4_generic_open(ext4_file *f, const char *path, const char *flags,
-			     bool file_expect, uint32_t *parent_inode,
-			     uint32_t *name_off)
-{
-	uint32_t iflags;
-	int filetype;
-	int r;
-	struct ext4_mountpoint *mp = ext4_get_mount(path);
-
-	if (ext4_parse_flags(flags, &iflags) == false)
-		return EINVAL;
-
-	if (file_expect == true)
-		filetype = EXT4_DE_REG_FILE;
-	else
-		filetype = EXT4_DE_DIR;
-
-	if (iflags & O_CREAT)
-		ext4_trans_start(mp);
-
-	r = ext4_generic_open2(f, path, iflags, filetype, parent_inode,
-				name_off);
-
-	if (iflags & O_CREAT) {
-		if (r == EOK)
-			ext4_trans_stop(mp);
-		else
-			ext4_trans_abort(mp);
-	}
-
-	return r;
-}
 
 static int ext4_create_hardlink(const char *path,
 		struct ext4_inode_ref *child_ref, bool rename)
@@ -1174,24 +1100,6 @@ int ext4_cache_flush(const char *path)
 	ret = ext4_block_cache_flush(mp->fs.bdev);
 	EXT4_MP_UNLOCK(mp);
 	return ret;
-}
-
-int ext4_fopen(ext4_file *file, const char *path, const char *flags)
-{
-	struct ext4_mountpoint *mp = ext4_get_mount(path);
-	int r;
-
-	if (!mp)
-		return ENOENT;
-
-	EXT4_MP_LOCK(mp);
-
-	ext4_block_cache_write_back(mp->fs.bdev, 1);
-	r = ext4_generic_open(file, path, flags, true, 0, 0);
-	ext4_block_cache_write_back(mp->fs.bdev, 0);
-
-	EXT4_MP_UNLOCK(mp);
-	return r;
 }
 
 int ext4_fopen2(ext4_file *file, const char *path, int flags)
