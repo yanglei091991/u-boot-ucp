@@ -19,7 +19,7 @@ int main()
 
 	ext4_mount("mmc", "/", true /* read only */);
 
-	ext4_fopen(&bootfile, "/boot.txt", "rb");
+	ext4_fopen2(&bootfile, "/boot.txt", O_RDONLY);
 
 	while (size) {
 		ext4_fread(&bootfile, buffer, BUFSZ, &size);
