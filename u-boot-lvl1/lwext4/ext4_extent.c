@@ -375,25 +375,6 @@ ext4_extent_header_set_generation(struct ext4_extent_header *header,
     header->generation = to_le32(generation);
 }
 
-void ext4_extent_tree_init(struct ext4_inode_ref *inode_ref)
-{
-    /* Initialize extent root header */
-    struct ext4_extent_header *header =
-            ext4_inode_get_extent_header(inode_ref->inode);
-    ext4_extent_header_set_depth(header, 0);
-    ext4_extent_header_set_entries_count(header, 0);
-    ext4_extent_header_set_generation(header, 0);
-    ext4_extent_header_set_magic(header, EXT4_EXTENT_MAGIC);
-
-    uint16_t max_entries = (EXT4_INODE_BLOCKS * sizeof(uint32_t) -
-            sizeof(struct ext4_extent_header)) /
-                    sizeof(struct ext4_extent);
-
-    ext4_extent_header_set_max_entries_count(header, max_entries);
-    inode_ref->dirty  = true;
-}
-
-
 static struct ext4_extent_tail *
 find_ext4_extent_tail(struct ext4_extent_header *eh)
 {
