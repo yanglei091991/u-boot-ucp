@@ -9,6 +9,6 @@ main: main.o file_dev.o lwext4.a
 	$(CC) $(CFLAGS) -o main main.o file_dev.o lwext4.a
 
 clean:
-	rm -f $(c_objs) lwext4.a main malloc.o file_dev.o
+	bash -c "rm -f lwext4.a main *.o *.gcov *.gcda *.gcno"
 
 .PHONY: clean
