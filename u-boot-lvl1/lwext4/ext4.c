@@ -287,73 +287,20 @@ static struct ext4_mountpoint *ext4_get_mount(const char *path)
 	return NULL;
 }
 
-__unused
-static int __ext4_trans_start(struct ext4_mountpoint *mp)
-{
-	int r = EOK;
-
-	if (mp->fs.jbd_journal && !mp->fs.curr_trans) {
-		struct jbd_journal *journal = mp->fs.jbd_journal;
-		struct jbd_trans *trans;
-		trans = jbd_journal_new_trans(journal);
-		if (!trans) {
-			r = ENOMEM;
-			goto Finish;
-		}
-		mp->fs.curr_trans = trans;
-	}
-Finish:
-	return r;
-}
-
-__unused
-static int __ext4_trans_stop(struct ext4_mountpoint *mp)
-{
-	int r = EOK;
-
-	if (mp->fs.jbd_journal && mp->fs.curr_trans) {
-		struct jbd_journal *journal = mp->fs.jbd_journal;
-		struct jbd_trans *trans = mp->fs.curr_trans;
-		r = jbd_journal_commit_trans(journal, trans);
-		mp->fs.curr_trans = NULL;
-	}
-	return r;
-}
-
-__unused
-static void __ext4_trans_abort(struct ext4_mountpoint *mp)
-{
-	if (mp->fs.jbd_journal && mp->fs.curr_trans) {
-		struct jbd_journal *journal = mp->fs.jbd_journal;
-		struct jbd_trans *trans = mp->fs.curr_trans;
-		jbd_journal_free_trans(journal, trans, true);
-		mp->fs.curr_trans = NULL;
-	}
-}
-
 static int ext4_trans_start(struct ext4_mountpoint *mp __unused)
 {
 	int r = EOK;
-#if CONFIG_JOURNALING_ENABLE
-	r = __ext4_trans_start(mp);
-#endif
 	return r;
 }
 
 static int ext4_trans_stop(struct ext4_mountpoint *mp __unused)
 {
 	int r = EOK;
-#if CONFIG_JOURNALING_ENABLE
-	r = __ext4_trans_stop(mp);
-#endif
 	return r;
 }
 
 static void ext4_trans_abort(struct ext4_mountpoint *mp __unused)
 {
-#if CONFIG_JOURNALING_ENABLE
-	__ext4_trans_abort(mp);
-#endif
 }
 
 
