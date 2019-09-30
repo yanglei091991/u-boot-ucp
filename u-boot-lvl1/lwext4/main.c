@@ -29,6 +29,6 @@ int main()
 
 	ext4_fclose(&bootfile);
 	ext4_umount("/");
-	puts("\nbuffer size used:");
+	fprintf(stderr, "\nbuffer size used:\n");
 	printptr();
 }
