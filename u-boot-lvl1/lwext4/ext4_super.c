@@ -107,21 +107,6 @@ static bool ext4_sb_verify_csum(struct ext4_sblock *s)
 	return s->checksum == to_le32(ext4_sb_csum(s));
 }
 
-static void ext4_sb_set_csum(struct ext4_sblock *s)
-{
-	if (!ext4_sb_feature_ro_com(s, EXT4_FRO_COM_METADATA_CSUM))
-		return;
-
-	s->checksum = to_le32(ext4_sb_csum(s));
-}
-
-int ext4_sb_write(struct ext4_blockdev *bdev, struct ext4_sblock *s)
-{
-	ext4_sb_set_csum(s);
-	return ext4_block_writebytes(bdev, EXT4_SUPERBLOCK_OFFSET, s,
-				     EXT4_SUPERBLOCK_SIZE);
-}
-
 int ext4_sb_read(struct ext4_blockdev *bdev, struct ext4_sblock *s)
 {
 	return ext4_block_readbytes(bdev, EXT4_SUPERBLOCK_OFFSET, s,
