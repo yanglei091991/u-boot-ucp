@@ -370,78 +370,6 @@ static int ext4_path_check(const char *path, bool *is_goal)
 	return 0;
 }
 
-static int ext4_trunc_inode(struct ext4_mountpoint *mp,
-			    uint32_t index, uint64_t new_size)
-{
-	int r = EOK;
-	struct ext4_fs *const fs = &mp->fs;
-	struct ext4_inode_ref inode_ref;
-	uint64_t inode_size;
-	bool has_trans = mp->fs.jbd_journal && mp->fs.curr_trans;
-	r = ext4_fs_get_inode_ref(fs, index, &inode_ref);
-	if (r != EOK)
-		return r;
-
-	inode_size = ext4_inode_get_size(&fs->sb, inode_ref.inode);
-	ext4_fs_put_inode_ref(&inode_ref);
-	if (has_trans)
-		ext4_trans_stop(mp);
-
-	while (inode_size > new_size + CONFIG_MAX_TRUNCATE_SIZE) {
-
-		inode_size -= CONFIG_MAX_TRUNCATE_SIZE;
-
-		ext4_trans_start(mp);
-		r = ext4_fs_get_inode_ref(fs, index, &inode_ref);
-		if (r != EOK) {
-			ext4_trans_abort(mp);
-			break;
-		}
-		r = ext4_fs_truncate_inode(&inode_ref, inode_size);
-		if (r != EOK)
-			ext4_fs_put_inode_ref(&inode_ref);
-		else
-			r = ext4_fs_put_inode_ref(&inode_ref);
-
-		if (r != EOK) {
-			ext4_trans_abort(mp);
-			goto Finish;
-		} else
-			ext4_trans_stop(mp);
-	}
-
-	if (inode_size > new_size) {
-
-		inode_size = new_size;
-
-		ext4_trans_start(mp);
-		r = ext4_fs_get_inode_ref(fs, index, &inode_ref);
-		if (r != EOK) {
-			ext4_trans_abort(mp);
-			goto Finish;
-		}
-		r = ext4_fs_truncate_inode(&inode_ref, inode_size);
-		if (r != EOK)
-			ext4_fs_put_inode_ref(&inode_ref);
-		else
-			r = ext4_fs_put_inode_ref(&inode_ref);
-
-		if (r != EOK)
-			ext4_trans_abort(mp);
-		else
-			ext4_trans_stop(mp);
-
-	}
-
-Finish:
-
-	if (has_trans)
-		ext4_trans_start(mp);
-
-	return r;
-}
-
-
 /*
  * NOTICE: if filetype is equal to EXT4_DIRENTRY_UNKNOWN,
  * any filetype of the target dir entry will be accepted.
@@ -573,11 +501,7 @@ static int ext4_generic_open2(ext4_file *f, const char *path, int flags,
 	if (is_goal) {
 
 		if ((f->flags & O_TRUNC) && (imode == EXT4_INODE_MODE_FILE)) {
-			r = ext4_trunc_inode(mp, ref.index, 0);
-			if (r != EOK) {
-				ext4_fs_put_inode_ref(&ref);
-				return r;
-			}
+			return EPERM;
 		}
 
 		f->mp = mp;
