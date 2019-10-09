@@ -179,4 +179,7 @@ void  ucp_sdio_main(void)
    mmc_bread(0, 3,(void *)0x41000000);
 
    mmc_bread(1, 3,(void *)0x42000000);
+
+   void loadfile(void *addr);
+   loadfile((void*)0x40000000);
 }
