@@ -13,8 +13,8 @@ void *ext4_user_malloc(size_t sz)
 	void *res = memory + ptr;
 	lastalloc = res;
 	ptr += bufsz;
-	assert (ptr < HEAPSIZE);
 #ifdef BOOT1_PRINTF
+	assert (ptr < HEAPSIZE);
 	fprintf(stderr, "malloc %ld @ %p\n", sz, res);
 #endif
 	return res;
