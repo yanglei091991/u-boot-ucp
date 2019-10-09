@@ -1,11 +1,11 @@
-CC      = arm-eabi-gcc
-AS      = arm-eabi-as
-LD      = arm-eabi-gcc
-AR      = arm-eabi-ar
-OBJCOPY = arm-eabi-objcopy
-OBJDUMP = arm-eabi-objdump
+CC      = arm-none-eabi-gcc
+AS      = arm-none-eabi-as
+LD      = arm-none-eabi-gcc
+AR      = arm-none-eabi-ar
+OBJCOPY = arm-none-eabi-objcopy
+OBJDUMP = arm-none-eabi-objdump
 
-CFLAGS 	  := -g -march=armv8-a -mtune=cortex-a53  -DGCC -falign-functions=16 -fno-common -falign-jumps=8 -falign-loops=8 -fomit-frame-pointer -funroll-loops -fPIE
+CFLAGS 		:= -g -march=armv8-a -mtune=cortex-a53  -DGCC -falign-functions=16 -fno-common -falign-jumps=8 -falign-loops=8 -fomit-frame-pointer -funroll-loops
 ASFLAGS   := -g -march=armv8-a
 LDFLAGS   := 
 
@@ -14,7 +14,7 @@ c_objs = $(filter %.o,$(patsubst %.c,%.o,$(SRCS)))
 s_objs = $(filter %.o,$(patsubst %.s,%.o,$(SRCS)))
 
 boot.bin: $(c_objs) $(s_objs)
-	${LD} -Wl,-pie,-T boot.ld $^ -o boot.elf
+	${LD} -Wl,-T boot.ld $^ -o boot.elf
 	${OBJCOPY} -O binary -S boot.elf $@
 	${OBJDUMP} -D -m arm boot.elf > boot.dis
 	./gen_ihex.sh

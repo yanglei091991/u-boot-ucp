@@ -52,6 +52,15 @@ int _unlink(const char *name) { }
 int _kill(int pid, int sig) { }
 int _fstat(int fildes, struct stat *buf) { }
 
+unsigned char output_char(unsigned char c)
+{
+    //volatile int *tube = (volatile int *) 0xfc000000;
+    volatile int *uart0_addr = (volatile int *) 0x02108000;
+
+    while((uart0_addr[0x14/4]&0x20)==0);
+      uart0_addr[0x0/4]=c;
+    return(c);
+}
 // Redirect output (from printf etc) to the tube.
 // This redirects all streams to the tube.
 int _write(int fh, char *buf, int count)
@@ -59,7 +68,7 @@ int _write(int fh, char *buf, int count)
   int i = 0;
 
   while (i < count)
-    ;
+    output_char(buf[i++]);
 
   return count;
 }

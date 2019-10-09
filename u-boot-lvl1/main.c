@@ -30,7 +30,7 @@
 extern char __bss_start__[], __bss_end__[];
 extern void __libc_init_array(void);
 extern void __libc_fini_array(void);
-
+void  ucp_sdio_main(void);
 void copy_data_to_ram(unsigned char *src,
                       unsigned char *dest, unsigned int len)
 {
@@ -54,7 +54,7 @@ int main()
 //    int val = ddr_test();
 //    if(val != 0)
 //        return 1;
-//        printf("ddr write and read err");
+//       printf("ddr write and read err");
 
   extern unsigned char data_load_start[];
   extern unsigned char __data_start[];
@@ -78,6 +78,7 @@ int main()
   unsigned char *dest = (unsigned char*)copy_addr;
   unsigned int boot_size = 0;
 
+  ucp_sdio_main();
 //  if(copy_boot2_to_ram(src,dest,&boot_size) == false)
 //  {
 //    return 1;  
