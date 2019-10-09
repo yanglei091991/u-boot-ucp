@@ -35,9 +35,6 @@
 #include <stdbool.h>
 
 /**@brief   File blockdev get.*/
-struct ext4_blockdev *file_dev_get(void);
-
-/**@brief   Set filename to open.*/
-void file_dev_name_set(const char *n);
+struct ext4_blockdev *mmc_dev_get(void);
 
 #endif /* FILE_DEV_H_ */

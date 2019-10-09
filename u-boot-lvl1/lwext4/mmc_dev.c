@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Grzegorz Kostka (kostka.grzegorz@gmail.com)
+ * Copyright (c) 2019 Cai Sipei
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,9 +26,6 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _LARGEFILE64_SOURCE
-#define _FILE_OFFSET_BITS 64
-
 #include <ext4_config.h>
 #include <ext4_blockdev.h>
 #include <ext4_errno.h>
@@ -36,107 +33,53 @@
 #include <stdbool.h>
 #include <string.h>
 
-/**@brief   Default filename.*/
-static const char *fname = "ext2";
-
-/**@brief   Image block size.*/
-#define EXT4_FILEDEV_BSIZE 512
-
-/**@brief   Image file descriptor.*/
-static FILE *dev_file;
-
-#define DROP_LINUXCACHE_BUFFERS 0
+uint32_t mmc_bread(uint32_t start, uint32_t blkcnt,void *dst);
 
 /**********************BLOCKDEV INTERFACE**************************************/
-static int file_dev_open(struct ext4_blockdev *bdev);
-static int file_dev_bread(struct ext4_blockdev *bdev, void *buf, uint64_t blk_id,
+static int mmc_dev_open(struct ext4_blockdev *bdev);
+static int mmc_dev_bread(struct ext4_blockdev *bdev, void *buf, uint64_t blk_id,
 			 uint32_t blk_cnt);
-static int file_dev_bwrite(struct ext4_blockdev *bdev, const void *buf,
+static int mmc_dev_bwrite(struct ext4_blockdev *bdev, const void *buf,
 			  uint64_t blk_id, uint32_t blk_cnt);
-static int file_dev_close(struct ext4_blockdev *bdev);
+static int mmc_dev_close(struct ext4_blockdev *bdev);
 
 /******************************************************************************/
-EXT4_BLOCKDEV_STATIC_INSTANCE(file_dev, EXT4_FILEDEV_BSIZE, 0, file_dev_open,
-		file_dev_bread, file_dev_bwrite, file_dev_close, 0, 0);
+EXT4_BLOCKDEV_STATIC_INSTANCE(mmc_dev, 512 /* block size */, 0, mmc_dev_open,
+		mmc_dev_bread, mmc_dev_bwrite, mmc_dev_close, 0, 0);
 
 /******************************************************************************/
-static int file_dev_open(struct ext4_blockdev *bdev)
+static int mmc_dev_open(struct ext4_blockdev *bdev)
 {
-	dev_file = fopen(fname, "r+b");
-
-	if (!dev_file)
-		return EIO;
-
-	/*No buffering at file.*/
-	setbuf(dev_file, 0);
-
-	if (fseeko(dev_file, 0, SEEK_END))
-		return EFAULT;
-
-	file_dev.part_offset = 0;
-	file_dev.part_size = ftello(dev_file);
-	file_dev.bdif->ph_bcnt = file_dev.part_size / file_dev.bdif->ph_bsize;
-
+	/* TODO: do mmc init? */
 	return EOK;
 }
 
 /******************************************************************************/
 
-static int file_dev_bread(struct ext4_blockdev *bdev, void *buf, uint64_t blk_id,
+static int mmc_dev_bread(struct ext4_blockdev *bdev, void *buf, uint64_t blk_id,
 			 uint32_t blk_cnt)
 {
-	if (fseeko(dev_file, blk_id * bdev->bdif->ph_bsize, SEEK_SET))
-		return EIO;
-	if (!blk_cnt)
-		return EOK;
-	if (!fread(buf, bdev->bdif->ph_bsize * blk_cnt, 1, dev_file))
-		return EIO;
+	/* NOTE: bdev->bdif->ph_bsize and MMC block size must be 512 */
+	mmc_bread(blk_id, blk_cnt, buf);
 
 	return EOK;
 }
 
-static void drop_cache(void)
-{
-#if defined(__linux__) && DROP_LINUXCACHE_BUFFERS
-	int fd;
-	char *data = "3";
-
-	sync();
-	fd = open("/proc/sys/vm/drop_caches", O_WRONLY);
-	write(fd, data, sizeof(char));
-	close(fd);
-#endif
-}
-
 /******************************************************************************/
-static int file_dev_bwrite(struct ext4_blockdev *bdev, const void *buf,
+static int mmc_dev_bwrite(struct ext4_blockdev *bdev, const void *buf,
 			  uint64_t blk_id, uint32_t blk_cnt)
 {
-	if (fseeko(dev_file, blk_id * bdev->bdif->ph_bsize, SEEK_SET))
-		return EIO;
-	if (!blk_cnt)
-		return EOK;
-	if (!fwrite(buf, bdev->bdif->ph_bsize * blk_cnt, 1, dev_file))
-		return EIO;
-
-	drop_cache();
-	return EOK;
+	return EIO;
 }
 /******************************************************************************/
-static int file_dev_close(struct ext4_blockdev *bdev)
+static int mmc_dev_close(struct ext4_blockdev *bdev)
 {
-	fclose(dev_file);
 	return EOK;
 }
 
 /******************************************************************************/
-struct ext4_blockdev *file_dev_get(void)
+struct ext4_blockdev *mmc_dev_get(void)
 {
-	return &file_dev;
-}
-/******************************************************************************/
-void file_dev_name_set(const char *n)
-{
-	fname = n;
+	return &mmc_dev;
 }
 /******************************************************************************/
