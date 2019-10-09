@@ -14,7 +14,9 @@ void *ext4_user_malloc(size_t sz)
 	lastalloc = res;
 	ptr += bufsz;
 	assert (ptr < HEAPSIZE);
+#ifdef BOOT1_PRINTF
 	fprintf(stderr, "malloc %ld @ %p\n", sz, res);
+#endif
 	return res;
 }
 
@@ -28,7 +30,9 @@ void *ext4_user_calloc(size_t nmemb, size_t size)
 
 void ext4_user_free(void *p)
 {
+#ifdef BOOT1_PRINTF
 	fprintf(stderr, "free @ %p\n", p);
+#endif
 	// if to free the last malloc'ed memory, then
 	// set ptr to the previous one, otherwise just let it leak
 	if (p == lastalloc) {
@@ -36,8 +40,9 @@ void ext4_user_free(void *p)
 		lastalloc = NULL;
 	}
 }
-
+#ifdef BOOT1_PRINTF
 void printptr(void)
 {
 	fprintf(stderr, "0x%08lx\n", ptr);
 }
+#endif
