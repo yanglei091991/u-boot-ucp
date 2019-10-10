@@ -158,101 +158,6 @@ int ext4_device_unregister_all(void)
 
 /****************************************************************************/
 
-static int ext4_link(struct ext4_mountpoint *mp, struct ext4_inode_ref *parent,
-		     struct ext4_inode_ref *ch, const char *n,
-		     uint32_t len, bool rename)
-{
-	/* Check maximum name length */
-	if (len > EXT4_DIRECTORY_FILENAME_LEN)
-		return EINVAL;
-
-	/* Add entry to parent directory */
-	int r = ext4_dir_add_entry(parent, n, len, ch);
-	if (r != EOK)
-		return r;
-
-	/* Fill new dir -> add '.' and '..' entries.
-	 * Also newly allocated inode should have 0 link count.
-	 */
-
-	bool is_dir = ext4_inode_is_type(&mp->fs.sb, ch->inode,
-			       EXT4_INODE_MODE_DIRECTORY);
-	if (is_dir && !rename) {
-
-#if CONFIG_DIR_INDEX_ENABLE
-		/* Initialize directory index if supported */
-		if (ext4_sb_feature_com(&mp->fs.sb, EXT4_FCOM_DIR_INDEX)) {
-			r = ext4_dir_dx_init(ch, parent);
-			if (r != EOK)
-				return r;
-
-			ext4_inode_set_flag(ch->inode, EXT4_INODE_FLAG_INDEX);
-			ch->dirty = true;
-		} else
-#endif
-		{
-			r = ext4_dir_add_entry(ch, ".", strlen("."), ch);
-			if (r != EOK) {
-				ext4_dir_remove_entry(parent, n, strlen(n));
-				return r;
-			}
-
-			r = ext4_dir_add_entry(ch, "..", strlen(".."), parent);
-			if (r != EOK) {
-				ext4_dir_remove_entry(parent, n, strlen(n));
-				ext4_dir_remove_entry(ch, ".", strlen("."));
-				return r;
-			}
-		}
-
-		/*New empty directory. Two links (. and ..) */
-		ext4_inode_set_links_cnt(ch->inode, 2);
-		ext4_fs_inode_links_count_inc(parent);
-		ch->dirty = true;
-		parent->dirty = true;
-		return r;
-	}
-	/*
-	 * In case we want to rename a directory,
-	 * we reset the original '..' pointer.
-	 */
-	if (is_dir) {
-		bool idx;
-		idx = ext4_inode_has_flag(ch->inode, EXT4_INODE_FLAG_INDEX);
-		struct ext4_dir_search_result res;
-		if (!idx) {
-			r = ext4_dir_find_entry(&res, ch, "..", strlen(".."));
-			if (r != EOK)
-				return EIO;
-
-			ext4_dir_en_set_inode(res.dentry, parent->index);
-			ext4_trans_set_block_dirty(res.block.buf);
-			r = ext4_dir_destroy_result(ch, &res);
-			if (r != EOK)
-				return r;
-
-		} else {
-#if CONFIG_DIR_INDEX_ENABLE
-			r = ext4_dir_dx_reset_parent_inode(ch, parent->index);
-			if (r != EOK)
-				return r;
-
-#endif
-		}
-
-		ext4_fs_inode_links_count_inc(parent);
-		parent->dirty = true;
-	}
-	if (!rename) {
-		ext4_fs_inode_links_count_inc(ch);
-		ch->dirty = true;
-	}
-
-	return r;
-}
-
-/****************************************************************************/
-
 int ext4_mount(const char *dev_name, const char *mount_point,
 	       bool read_only)
 {
@@ -607,36 +512,7 @@ static int ext4_generic_open2(ext4_file *f, const char *path, int flags,
 
 			/*Destroy last result*/
 			ext4_dir_destroy_result(&ref, &result);
-			if (r != ENOENT)
-				break;
-
-			if (!(f->flags & O_CREAT))
-				break;
-
-			/*O_CREAT allows create new entry*/
-			struct ext4_inode_ref child_ref;
-			r = ext4_fs_alloc_inode(fs, &child_ref,
-					is_goal ? ftype : EXT4_DE_DIR);
-
-			if (r != EOK)
-				break;
-
-			ext4_fs_inode_blocks_init(fs, &child_ref);
-
-			/*Link with root dir.*/
-			r = ext4_link(mp, &ref, &child_ref, path, len, false);
-			if (r != EOK) {
-				/*Fail. Free new inode.*/
-				ext4_fs_free_inode(&child_ref);
-				/*We do not want to write new inode.
-				  But block has to be released.*/
-				child_ref.dirty = false;
-				ext4_fs_put_inode_ref(&child_ref);
-				break;
-			}
-
-			ext4_fs_put_inode_ref(&child_ref);
-			continue;
+			break; // ENOENT
 		}
 
 		if (parent_inode)
