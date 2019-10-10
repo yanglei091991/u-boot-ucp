@@ -64,8 +64,11 @@
 
 /* Physical Memory Map */
 
-#define UCP_DDR_BASE                0x20000000
+#define UCP_DDR_BASE                0x10000000
 #define CONFIG_SYS_SDRAM_BASE		UCP_DDR_BASE
+
+#define PHYS_SDRAM_1				UCP_DDR_BASE
+#define PHYS_SDRAM_1_SIZE		(0x10000000 * 2)
 //#define PHYS_SDRAM_SIZE             (0x10000000 * 4) /* 256MB * 4 */
 //#define CONFIG_SYS_DRAM_SIZE        PHYS_SDRAM_SIZE
 //#define CONFIG_SYS_SDRAM_SIZE       PHYS_SDRAM_SIZE 
@@ -114,18 +117,24 @@
 #define CONFIG_NET_RETRY_COUNT		20
 #define CONFIG_ARP_TIMEOUT		5000 /* millisec */
 
-#define MEM_LAYOUT_ENV_SETTINGS \
+/*#define MEM_LAYOUT_ENV_SETTINGS \
 	"bootm_size=0x20000000\0" \
     "bootm_low=0x30000000\0" \
-    "ethaddr=b2:77:62:76:f9:ee\0"
+    "ethaddr=b2:77:62:76:f9:ee\0" 
+*/
+#define MEM_LAYOUT_ENV_SETTINGS \
+    "ethaddr=b2:77:62:76:f9:ee\0" 
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	MEM_LAYOUT_ENV_SETTINGS \
     "bootargs=console=ttyS0,115200n8 rdinit=/linuxrc\0"
+//    "bootm 0x30000000 - 0x38000000\0"
 
+#define UCPBOOTCOMMAND \
+    "bootm 0x30000000 - 0x38000000"
+
+#define CONFIG_BOOTCOMMAND UCPBOOTCOMMAND
 //#define CONFIG_NR_DRAM_BANKS		1
-#define PHYS_SDRAM_1				UCP_DDR_BASE
-#define PHYS_SDRAM_1_SIZE		(0x10000000 * 2)
 
 //#define CONFIG_FS_EXT4
 //#define CONFIG_EXT4_WRITE
