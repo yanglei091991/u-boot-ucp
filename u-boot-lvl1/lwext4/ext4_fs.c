@@ -110,14 +110,7 @@ int ext4_fs_init(struct ext4_fs *fs, struct ext4_blockdev *bdev,
 
 
 	if (!fs->read_only) {
-		/* Mark system as mounted */
-		ext4_set16(&fs->sb, state, EXT4_SUPERBLOCK_STATE_ERROR_FS);
-		r = ext4_sb_write(fs->bdev, &fs->sb);
-		if (r != EOK)
-			return r;
-
-		/*Update mount count*/
-		ext4_set16(&fs->sb, mount_count, ext4_get16(&fs->sb, mount_count) + 1);
+		return EINVAL;
 	}
 
 	return r;
@@ -131,7 +124,7 @@ int ext4_fs_fini(struct ext4_fs *fs)
 	ext4_set16(&fs->sb, state, EXT4_SUPERBLOCK_STATE_VALID_FS);
 
 	if (!fs->read_only)
-		return ext4_sb_write(fs->bdev, &fs->sb);
+		return EINVAL;
 
 	return EOK;
 }
