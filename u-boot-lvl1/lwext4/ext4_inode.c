@@ -76,25 +76,6 @@ uint32_t ext4_inode_get_mode(struct ext4_sblock *sb, struct ext4_inode *inode)
 	return v;
 }
 
-void ext4_inode_set_mode(struct ext4_sblock *sb, struct ext4_inode *inode,
-			 uint32_t mode)
-{
-	inode->mode = to_le16((mode << 16) >> 16);
-
-	if (ext4_get32(sb, creator_os) == EXT4_SUPERBLOCK_OS_HURD)
-		inode->osd2.hurd2.mode_high = to_le16(mode >> 16);
-}
-
-uint32_t ext4_inode_get_uid(struct ext4_inode *inode)
-{
-	return to_le32(inode->uid);
-}
-
-void ext4_inode_set_uid(struct ext4_inode *inode, uint32_t uid)
-{
-	inode->uid = to_le32(uid);
-}
-
 uint64_t ext4_inode_get_size(struct ext4_sblock *sb, struct ext4_inode *inode)
 {
 	uint64_t v = to_le32(inode->size_lo);
@@ -133,53 +114,6 @@ void ext4_inode_set_csum(struct ext4_sblock *sb, struct ext4_inode *inode,
 	if (inode_size > EXT4_GOOD_OLD_INODE_SIZE)
 		inode->checksum_hi = to_le16(checksum >> 16);
 
-}
-
-uint32_t ext4_inode_get_access_time(struct ext4_inode *inode)
-{
-	return to_le32(inode->access_time);
-}
-void ext4_inode_set_access_time(struct ext4_inode *inode, uint32_t time)
-{
-	inode->access_time = to_le32(time);
-}
-
-uint32_t ext4_inode_get_change_inode_time(struct ext4_inode *inode)
-{
-	return to_le32(inode->change_inode_time);
-}
-void ext4_inode_set_change_inode_time(struct ext4_inode *inode, uint32_t time)
-{
-	inode->change_inode_time = to_le32(time);
-}
-
-uint32_t ext4_inode_get_modif_time(struct ext4_inode *inode)
-{
-	return to_le32(inode->modification_time);
-}
-
-void ext4_inode_set_modif_time(struct ext4_inode *inode, uint32_t time)
-{
-	inode->modification_time = to_le32(time);
-}
-
-uint32_t ext4_inode_get_del_time(struct ext4_inode *inode)
-{
-	return to_le32(inode->deletion_time);
-}
-
-void ext4_inode_set_del_time(struct ext4_inode *inode, uint32_t time)
-{
-	inode->deletion_time = to_le32(time);
-}
-
-uint32_t ext4_inode_get_gid(struct ext4_inode *inode)
-{
-	return to_le32(inode->gid);
-}
-void ext4_inode_set_gid(struct ext4_inode *inode, uint32_t gid)
-{
-	inode->gid = to_le32(gid);
 }
 
 uint16_t ext4_inode_get_links_cnt(struct ext4_inode *inode)
