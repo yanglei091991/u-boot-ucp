@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <assert.h>
 
-#define HEAPSIZE (1 << 20)
+#define HEAPSIZE (16 * 1024)
 static char memory[HEAPSIZE];
 static size_t ptr = 0;
 static char *lastalloc;
