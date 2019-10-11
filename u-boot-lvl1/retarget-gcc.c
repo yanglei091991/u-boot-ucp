@@ -82,31 +82,6 @@ void _exit(int c)
   while (1);
 }
 
-caddr_t _sbrk_r ( struct _reent *r, int incr )
-{
-    extern   unsigned char  bottom_of_heap asm ("heap_base");
-    register unsigned char* stack_pointer  asm ("sp");
-
-    static unsigned char *heap_end;
-    unsigned char        *prev_heap_end;
-
-    if (heap_end == NULL)
-        heap_end = &bottom_of_heap;
-
-    prev_heap_end = heap_end;
-
-    if (heap_end + incr > stack_pointer) {
-        r->_errno = ENOMEM;
-
-        return (caddr_t) -1;
-    }
-
-    heap_end += incr;
-
-    return (caddr_t) prev_heap_end;
-}
-
-
 void init_libc(void)
 {
     // Zero the BSS

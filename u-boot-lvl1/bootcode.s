@@ -42,7 +42,7 @@ bootcode:
                 .equ MODE_SYS                , 0x1f
 
 
-                ldr     r0, =stack_top         // stack_top imported from space allocated in stackheap.S
+                ldr     r0, = BOOT1_STACK_TOP  // stack_top imported from space allocated in stackheap.S
                 mrc     p15, 0, r1, c0, c0, 5
                 and     r1, r1, #0xff          // r1 = CPU number
                 mov     r2, #(CPU_STACK_SIZE)

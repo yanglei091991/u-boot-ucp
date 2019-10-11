@@ -34,10 +34,10 @@
 
                 .global  stack_top
                 .global  heap_base
-
-heap_base:      .space   1
-                .space   (HEAP_SIZE-1)
-                .space   (STACK_SIZE-4)
-stack_top:      .space   4
+//
+//heap_base:      .space   1
+//                .space   (HEAP_SIZE-1)
+//                .space   (STACK_SIZE-4)
+//stack_top:      .space   4
 
                 .end
