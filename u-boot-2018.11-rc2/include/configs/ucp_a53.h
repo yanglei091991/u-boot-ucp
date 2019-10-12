@@ -131,7 +131,9 @@
 //    "bootm 0x30000000 - 0x38000000\0"
 
 #define UCPBOOTCOMMAND \
-    "bootm 0x30000000 - 0x38000000"
+    "ext4load mmc 0 0x10000000 uImage; " \
+    "ext4load mmc 0 0x18000000 ucp.dtb; " \
+    "bootm 0x10000000 - 0x18000000"
 
 #define CONFIG_BOOTCOMMAND UCPBOOTCOMMAND
 //#define CONFIG_NR_DRAM_BANKS		1
