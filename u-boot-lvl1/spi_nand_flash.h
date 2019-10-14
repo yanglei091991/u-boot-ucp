@@ -96,6 +96,7 @@
 
 /* block0 空间分配   */
 #define    BLOCK0           0x0       /* block0 page n   */
+/* block0 page0-1 预留 */
 #define    CC_BK_PAGE       0x2        /* 出厂坏块标记的存储页--block0 page x */
 #define    USE_BK_PAGE      0x3        /* 使用坏块标记的存储页--block0 page y  */
 
@@ -103,15 +104,17 @@
 #define    DDR_PAGE         0x5       /* DDR参数 */
 #define    LINUX_PAGE       0x6
 #define    LINUX_FS_PAGE    0x7
-#define    END_PAGE         (LINUX_FS_PAGE+1)
+#define    LINUX_FS_DTB     0x8
+#define    END_PAGE         (LINUX_FS_DTB+1)
 
 
 /*  */
-#define    FILE_NUM_ALL      0x4  
+#define    FILE_NUM_ALL      0x5  
 #define    FILE_UBOOT        0x0
 #define    FILE_DDR          0x1
 #define    FILE_LINUX        0x2
 #define    FILE_LINUX_FS     0x3
+#define    FILE_LINUX_DTB    0x4
 
 
 #define    BK_LEN                 64         /*  坏块表长度 */

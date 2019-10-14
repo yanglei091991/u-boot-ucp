@@ -7,7 +7,7 @@
 #pragma GCC optimize ("O0")
 
 
-
+#if  0
 void    spi0_cs_high(void)
 {
     unsigned int  val;    
@@ -26,10 +26,10 @@ void    spi0_cs_low(void)
     gpio_swportb_dr = val;
 
 }
-
+#endif
 
 // gpiob_set_value(unsigned int pin_num, 0)
-// gpiob_set_value(GPIO_LED0_PIN, 1)    
+// boot_gpio_set_value(GPIO_LED0_PIN, 1)    
 void boot_gpio_set_value(unsigned int pin_num, unsigned char value)
 {
     unsigned int  val;    
@@ -47,17 +47,58 @@ void boot_gpio_set_value(unsigned int pin_num, unsigned char value)
 }
 
 
-
-unsigned int boot_gpiob_read(void)
+/* Pad66-- LED0   AP_GPIOB17 */
+/* Pad73-- LED1   AP_GPIOB20 */
+/* Pad74-- LED2   AP_GPIOB21 */
+void  drv_led0_on(void)
 {
      unsigned int  value;
      value = gpio_swportb_dr;
-     return  value;
+     value  |= GPIO_Pin_19; 
+     gpio_swportb_dr = value;
 }
 
+void  drv_led0_off(void)
+{
+     unsigned int  value;
+     value = gpio_swportb_dr;
+     value  &= (~GPIO_Pin_19); 
+     gpio_swportb_dr = value;
+}
 
+#if  0
+void  drv_led1_on(void)
+{
+     unsigned int  value;
+     value = gpio_swportb_dr;
+     value  |= GPIO_Pin_20; 
+     gpio_swportb_dr = value;
+}
 
+void  drv_led1_off(void)
+{
+     unsigned int  value;
+     value = gpio_swportb_dr;
+     value  &= (~GPIO_Pin_20); 
+     gpio_swportb_dr = value;
+}
 
+void  drv_led2_on(void)
+{
+     unsigned int  value;
+     value = gpio_swportb_dr;
+     value  |= GPIO_Pin_21; 
+     gpio_swportb_dr = value;
+}
+
+void  drv_led2_off(void)
+{
+     unsigned int  value;
+     value = gpio_swportb_dr;
+     value  &= (~GPIO_Pin_21); 
+     gpio_swportb_dr = value;
+}
+#endif
 
 /* GPIO define from  A53 */
 void  drv_gpio_init(void)
@@ -70,23 +111,14 @@ void  drv_gpio_init(void)
     gpio_swporta_ctl   = 0;
 #endif
 
-
-#if   1    
-/* gpio[32]--bit0, 
-   gpio[32-39] input    <-- AD9361--CTRL_OUT0        
-   gpio[40-43] output  --> AD9361--CTRL_IN0    --all 1
-   gpio[44]       output  --> AD9361--EN_AGC   -- /HOLD
-   gpio[45]--> AD9361--SYNC_IN   -- /WP
-   gpio[46]--> AD9361--RESETB    -- LED0
-   gpio[47]--> AD9361--TXNRX      -- 
-   gpio[48]--> AD9361--ENABLE,    -- 
-   0x0001FF00 
-*/
-    gpio_swportb_ddr = 0x0001FF00;     /* Data Direction: 1--output, 0--input */
-    //gpio_swportb_dr =  0x0001FF00;      /*  */
-    gpio_swportb_dr =  0x0001FF00;           /*   */
+/* Pad66-- LED0   AP_GPIOB17 */
+/* Pad73-- LED1   AP_GPIOB20 */
+/* Pad74-- LED2   AP_GPIOB21 */
+    gpio_swportb_ddr = GPIO_Pin_19;     /* Data Direction: 1--output, 0--input */
+    gpio_swportb_dr =  0;           /* output level  */
     gpio_swportb_ctl =0;
-#endif
+
+
 
 }
 

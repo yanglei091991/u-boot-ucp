@@ -6,6 +6,12 @@
 #pragma GCC push_options
 #pragma GCC optimize ("O0")
 
+#define    DRV_OK                     0x0
+#define    WAIT_TIMEOUT        0x1
+#define    ECC_ERROR               0x2
+#define    PARA_ERROR            0x3
+#define    ERASE_ERROR          0x4
+#define    PROM_ERROR           0x5
 
 //volatile unsigned int *uart0_addr=(volatile unsigned int *) UART_BASE_0;
 struct mapu_uart *uart0_addr =(struct mapu_uart *)UART_BASE_0;
@@ -41,6 +47,9 @@ void sendchar(unsigned char *ch)
 	  uart0_addr->reg0.thr = send_ch;
 }
 
+
+
+#if  0
 unsigned char receive_char(void)
 {
   volatile int ch = '0';
@@ -51,8 +60,11 @@ unsigned char receive_char(void)
 	ch = uart0_addr->reg0.rbr;
 	return (char)ch;
 }
+#endif
 
-/* 串口输出一个字符串 */
+/* 串口输出一个字符串
+  Uart_Printf("UART init success\n\r");
+*/
 void Uart_Printf(unsigned char *string)
 {
 	unsigned char *buf;
@@ -62,6 +74,21 @@ void Uart_Printf(unsigned char *string)
 		buf++;
 	}while(*buf!='\0');
 }
+
+void  print_hex(unsigned char hex)
+{
+   char    out[5];
+   
+      out[0] = 48 + hex / 16;
+      out[1] = 48 + hex % 16;
+      if (out[0] > 57) out[0] += 7;
+      if (out[1] > 57) out[1] += 7;
+	  out[2]= '\n';
+	  out[3]= '\r';
+	  out[4]= '\0';
+	  Uart_Printf(out);
+}
+
 
 #pragma GCC pop_options
 

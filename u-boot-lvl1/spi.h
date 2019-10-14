@@ -28,9 +28,16 @@
 //Ã¦×´Ì¬
 #define SSI_BUSY	(0x1<<0)
 
-/* SPI¼Ä´æÆ÷µØÖ·¶¨Òå */
-//#define SPI_BASE     0x42040000
-#define SPI_BASE     0x02100000
+/* SPI¼Ä´æÆ÷µØÖ·¶¨Òå
+SPI0	  0x020f8000
+SPI1	  0x02100000
+SPI2	  0x04a00000
+SPI3	  0x04a10000
+*/
+//#define SPI_BASE     0x020f8000     //0x42040000
+#define SPI_BASE    0x04a00000      /* SPI2 */
+
+
 #define CTRLR0 	   (*(volatile unsigned int *)(SPI_BASE+0x00))
 #define CTRLR1 	   (*(volatile unsigned int *)(SPI_BASE+0x04))
 #define SSIENR 	   (*(volatile unsigned int *)(SPI_BASE+0x08))

@@ -31,6 +31,8 @@ extern char __bss_start__[], __bss_end__[];
 extern void __libc_init_array(void);
 extern void __libc_fini_array(void);
 void  ucp_sdio_main(void);
+void  ucp_read_uboot(void);
+
 void copy_data_to_ram(unsigned char *src,
                       unsigned char *dest, unsigned int len)
 {
@@ -66,11 +68,20 @@ int main()
 //                    (unsigned int)data_size);
 //  }
 
-// init interface 
-//  spi_nand_flash_init();
-//  boot_uart_init();
-//  drv_gpio_init();
 
+// init interface 
+#if  0
+  pinmux_init();
+  drv_gpio_init();
+
+  drv_led0_on();
+  drv_led0_off();  
+
+#endif
+  boot_uart_init();
+  Uart_Printf("UART init success! \n\r");
+
+  ucp_read_uboot();
  // add read_id() select read_interface of the manufacturers
 //  volatile int read_arr_index = 0;
 
@@ -78,7 +89,7 @@ int main()
   unsigned char *dest = (unsigned char*)copy_addr;
   unsigned int boot_size = 0;
 
-  ucp_sdio_main();
+  //ucp_sdio_main();
 //  if(copy_boot2_to_ram(src,dest,&boot_size) == false)
 //  {
 //    return 1;  

@@ -1,5 +1,6 @@
 #include "crc16_test.h"
 
+#if  0
 unsigned short crc16(char* data_p, unsigned short length)
 {
   unsigned char i;
@@ -28,6 +29,7 @@ unsigned short crc16(char* data_p, unsigned short length)
    
   return (crc);
 }
+#endif
 
 unsigned int crc32(char *p_data, unsigned int length)
 {

@@ -27,7 +27,7 @@ int add_dwmci(struct dwmci_host *host, u32 max_clk, u32 min_clk);
 
 int mmc_set_blocklen(struct mmc *mmc, int len);
 int mmc_read_blocks(struct mmc *mmc, void *dst, unsigned int start,unsigned int blkcnt);
-
+const char *mmc_mode_name(enum bus_mode mode);
 struct mmc *mmc_create(const struct mmc_config *cfg, void *priv)
 //struct mmc *mmc_create(const struct mmc_config *cfg)
 {
@@ -79,7 +79,7 @@ u32 mmc_bread(u32 start, u32 blkcnt,void *dst)
 	if (mmc_set_blocklen(mmc, mmc->read_bl_len)) 
 	{
 		//pr_debug("%s: Failed to set blocklen\n", __func__);
-		debug("%s: Failed to set blocklen\n", __func__);
+		debug("%s: Failed to set blocklen\n\r", __func__);
 		return 0;
 	}
 
@@ -92,7 +92,7 @@ u32 mmc_bread(u32 start, u32 blkcnt,void *dst)
 		if (mmc_read_blocks(mmc, dst, start, cur) != cur) 
 		{
 			//pr_debug("%s: Failed to read blocks\n", __func__);
-			debug("%s: Failed to read blocks\n", __func__);
+			debug("%s: Failed to read blocks\n\r", __func__);
 			return 0;
 		}
 		blocks_todo -= cur;
@@ -107,9 +107,19 @@ u32 mmc_bread(u32 start, u32 blkcnt,void *dst)
 ulong get_timer(ulong usec)
 {
     ulong  now,base;
-    
+	uint   value;
+
+#if 0    
     if(!usec)
       return (readl(&systimer_base->timer0value)/BASE_US);
+#else
+    if(!usec)
+    {
+       value = readl(&systimer_base->timer0value);
+       return (value/BASE_US);
+    }
+
+#endif
       
     base = (usec*BASE_US);
     now = readl(&systimer_base->timer0value);
@@ -136,7 +146,8 @@ ulong get_timer(ulong usec)
 int ucp_sdio_init(void)
 {
     struct dwmci_host *host = &ucp_host;
-
+    int err=0;
+    
 	memset(host,0,sizeof(struct dwmci_host));
 	memset(&ucp_mmc,0,sizeof(struct mmc));
 	
@@ -153,14 +164,75 @@ int ucp_sdio_init(void)
 	/* Add the mmc channel to be registered with mmc core */
 	if (add_dwmci(host, DWMMC_MAX_FREQ, DWMMC_MIN_FREQ)) 
 	{
-		debug("DWMMC registration failed\n");
+		debug("DWMMC registration failed\n\r");
 		return -1;
-	}
-
+	}    
     ucp_mmc.dsr_imp		= 0;
     ucp_mmc.dsr			= 0xffffffff;
-    mmc_init(&ucp_mmc);	
+    err = mmc_init(&ucp_mmc);	
+	if(err)
+	  debug("%s: Failed in mmc_init(). \n\r", __func__);
 }
+
+#if  1 /* only test */
+void udelay(unsigned long usec);
+void  test_timer(void)
+{
+    ulong start;
+	unsigned  int  stop,i;
+
+   for(i=1;i<20;i=2*i)
+   {
+     start = get_timer(0);
+     udelay(100*i);
+     stop = get_timer(start);
+     debug("delay is %d:\n\r",stop);
+   	}
+    
+}
+
+void print_mmcinfo(struct mmc *mmc)
+{
+	//int i;
+
+	debug("Device: %s\n\r", mmc->cfg->name);
+	debug("Manufacturer ID: %x\n\r", mmc->cid[0] >> 24);
+	debug("OEM: %x\n\r", (mmc->cid[0] >> 8) & 0xffff);
+	debug("Name: %c%c%c%c%c \n\r", mmc->cid[0] & 0xff,
+			(mmc->cid[1] >> 24), (mmc->cid[1] >> 16) & 0xff,
+			(mmc->cid[1] >> 8) & 0xff, mmc->cid[1] & 0xff);
+
+	debug("Bus Speed: %d\n\r", mmc->clock);
+	debug("Mode : %s\n\r", mmc_mode_name(mmc->selected_mode));
+	debug("card capabilities:0x%x \n\r", mmc->card_caps);
+	debug("host capabilities:0x%x \n\r", mmc->host_caps);
+	
+	debug("Rd Block Len: %d\n\r", mmc->read_bl_len);
+
+	debug("%s version %d.%d", IS_SD(mmc) ? "SD" : "MMC",
+			EXTRACT_SDMMC_MAJOR_VERSION(mmc->version),
+			EXTRACT_SDMMC_MINOR_VERSION(mmc->version));
+	if (EXTRACT_SDMMC_CHANGE_VERSION(mmc->version) != 0)
+		debug(".%d", EXTRACT_SDMMC_CHANGE_VERSION(mmc->version));
+	debug("\n\r");
+
+	debug("High Capacity: %s\n\r", mmc->high_capacity ? "Yes" : "No");
+	debug("Capacity: %d \n\r",mmc->capacity);
+	//debug(mmc->capacity, "\n");
+
+	debug("Bus Width: %d-bit%s\n", mmc->bus_width,
+			mmc->ddr_mode ? " DDR" : "");
+
+#ifdef MMC_WRITE
+	puts("Erase Group Size: ");
+	print_size(((u64)mmc->erase_grp_size) << 9, "\n");
+#endif
+
+}
+
+
+
+#endif
 
 void  ucp_sdio_main(void)
 {
@@ -171,9 +243,11 @@ void  ucp_sdio_main(void)
    //ucp_mmc.cfg->host_caps =0;
 
    ucp_timer_init();
-
-   //mmc_init(&ucp_mmc);
+   
+   test_timer();
    ucp_sdio_init();
+   print_mmcinfo(&ucp_mmc);
+
 //   mmc_bread(0, 1,(void *)0x40000000);
 
 //   mmc_bread(0, 3,(void *)0x41000000);

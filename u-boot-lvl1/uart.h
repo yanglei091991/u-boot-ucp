@@ -1,5 +1,5 @@
 
-#if 1
+#if 0
 #define UART_BASE_0      0x42000000      /* UART 0 */
 
 
@@ -16,13 +16,16 @@
 
 
 
-#define UART0_CLK                25000000   /* 25MHz */
+//#define UART0_CLK              25000000   /* 25MHz */
+#define UART0_CLK                50000000   /* 50MHz */
 #define UART0_BAUDRATE    115200
 
 
 #define UART_LCRVAL  UART_LCR_8N1		    /* 8 data, 1 stop, no parity */
 #define UART_FCRVAL  (UART_FCR_FIFO_EN |UART_FCR_RXSR |	UART_FCR_TXSR)		/* Clear & enable FIFOs */
+#define  UART_NUM     10
 
+#define   M_LEN_10K   (10*1024)
 
 struct mapu_uart { 
   union{ 
@@ -179,6 +182,7 @@ struct mapu_uart {
 #define UART_IER_ERBFI UART_IER_RDI
 
 void   boot_uart_init(void);
+void Uart_Printf(unsigned char *string);
 
 
 
