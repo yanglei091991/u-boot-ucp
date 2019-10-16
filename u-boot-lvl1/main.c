@@ -61,12 +61,12 @@ int main()
   extern unsigned char data_load_start[];
   extern unsigned char __data_start[];
   extern unsigned int  data_size[];
-//  if(__data_start != data_load_start)
-//  {
-//    copy_data_to_ram(data_load_start,
-//                     __data_start,
-//                    (unsigned int)data_size);
-//  }
+  if(__data_start != data_load_start)
+  {
+    copy_data_to_ram(data_load_start,
+                     __data_start,
+                    (unsigned int)data_size);
+  }
 
 
 // init interface 

@@ -41,15 +41,18 @@ SECTIONS
   } 
 
   /* Data */
-  .data  :
+  .data 0x020c0000 :AT(ADDR(.ARM.exidx) + SIZEOF(.ARM.exidx))
   { 
    __data_start = .;
   . = ALIGN(4);
-    *(.data*) 
+    *(.data*)
+    *(.init_array*) 
+    *(.fini_array*)
+    *(.got*)
   . = ALIGN(4);
    __data_end = .;
   } 
-  
+ /* 
   .rel.dyn : 
   {
    __rel_dyn_start = .;
@@ -74,7 +77,7 @@ SECTIONS
     . = ALIGN(4);
     *(.dynsym)
   }
-
+*/
   /* Notes section
    * This is not used so we discard it. Although not used it needs to be
    * explicitly mentioned in the linker script as some toolchains will place
@@ -82,7 +85,7 @@ SECTIONS
   /DISCARD/ : { *(.note*) }
 
   /* Uninitialized data */
-  .bss   :
+  .bss 0x020c0000+SIZEOF(.data) : AT(LOADADDR(.data) + SIZEOF(.data)) 
   {
   __bss_start__ = .;
   . = ALIGN(4);
@@ -92,7 +95,7 @@ SECTIONS
   . = ALIGN(4);
   } 
 data_load_start = LOADADDR(.data);
-data_size = SIZEOF(.data)+SIZEOF(.bss);
+data_size = SIZEOF(.data);
   . = ALIGN(4);
   __end__   = .;
 }
