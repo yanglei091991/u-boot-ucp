@@ -28,3 +28,6 @@ symbol-file F:\ucp_boot2\u-boot-2018.11-rc2\u-boot  ((gd_t*)($r9))->reloc_off
 restore "F:\ucp_boot2\fpga\uImage" binary S:0x30000000
 restore "F:\ucp_boot2\fpga\ucp.dtb" binary S:0x38000000
 c
+
+//arm ds-5 "How to load sections to LMA, not VMA, during debugging with elf file"
+set elf load-segments-at-p_paddr on
