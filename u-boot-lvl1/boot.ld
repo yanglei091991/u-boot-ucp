@@ -1,5 +1,6 @@
 ENTRY(bootcode)
 
+RAM_DATA_BASE = 0x020c0000;
 SECTIONS
 {
   . = 0x00000000;
@@ -41,7 +42,7 @@ SECTIONS
   } 
 
   /* Data */
-  .data 0x020c0000 :AT(ADDR(.ARM.exidx) + SIZEOF(.ARM.exidx))
+  .data RAM_DATA_BASE :AT(ADDR(.ARM.exidx) + SIZEOF(.ARM.exidx))
   { 
    __data_start = .;
   . = ALIGN(4);
@@ -85,7 +86,7 @@ SECTIONS
   /DISCARD/ : { *(.note*) }
 
   /* Uninitialized data */
-  .bss 0x020c0000+SIZEOF(.data) : AT(LOADADDR(.data) + SIZEOF(.data)) 
+  .bss RAM_DATA_BASE + SIZEOF(.data) : AT(LOADADDR(.data) + SIZEOF(.data)) 
   {
   __bss_start__ = .;
   . = ALIGN(4);
