@@ -105,11 +105,11 @@ bootcode:
                 cmp     r0, #1                  // cpu1 run
                 beq     cpu1_jump
                 // cpu1 wakeup start
-                ldr r1, =0x03670060
+                ldr r1, =CPU1_RESET_ADDR
                 ldr r1, [r1]
                 mov r2, #2
                 orr r1, r1, r2
-                ldr r3, =0x03670060
+                ldr r3, =CPU1_RESET_ADDR
                 str r1, [r3]
                 // cpu1 wakeup end
                 b     cpu_start
@@ -144,7 +144,7 @@ bootcode:
 wfe_lable:
                 wfe
 cpu1_jump:
-                ldr r1, =0x03690058
+                ldr r1, =CPU1_SYS_CTRL
                 ldr r0, [r1]
                 cmp r0, #0
                 beq  wfe_lable
