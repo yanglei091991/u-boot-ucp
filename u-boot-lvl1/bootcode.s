@@ -130,15 +130,6 @@ bootcode:
                 // assember test.  Weakly import the labels for each and to
                 // determine the correct one.  Note that the linker translates
                 // any branches to non-existant weakly-imported labels to NOPs.
-                
-//                mov r0, #0
-//                ldr r1, =#100000
-//timer_loop:
-//                add r0, r0, #1 
-//                cmp r0, r1
-//                bne timer_loop
-//my_loop:
-//                b my_loop
 
 /**********************************************/
 wfe_lable:
@@ -213,19 +204,35 @@ cpu_start:
 //				add	lr, lr, r9
 				/* jump to _arm_start */
 //				mov	pc, lr
+				
+                // clear share mem 0-5
+                mov r2, #0
+                ldr r0, =SM5_START_ADDR // 128KB
+				ldr r1, =SM5_END_ADDR
+                bl copy_loop
+                ldr r0, =SM03_START_ADDR // 1M
+				ldr r1, =SM03_END_ADDR
+                bl copy_loop
+                // call c  main
                 bl _arm_start
 start_boot2:
-                ldr r0, =0x04e60000 /*boot2 entry point*/
+                ldr r0, =BOOT2_START_ADDR /*boot2 entry point*/
                 mov lr, r0
                 mov pc, lr          /* jump to boot2 */
+ 
+copy_loop:
+				mov r3, r2
+				str r3, [r0], #4
+				cmp r0, r1
+				bne copy_loop
+                bx lr
 
-
-.global _TEXT_BASE
-_TEXT_BASE:
-				.word bootcode	
-.global	_arm_start_ofs	
-_arm_start_ofs:
-				.word _arm_start - bootcode
+//.global _TEXT_BASE
+//_TEXT_BASE:
+//				.word bootcode	
+//.global	_arm_start_ofs	
+//_arm_start_ofs:
+//				.word _arm_start - bootcode
 //.global _rel_dyn_start_ofs
 //_rel_dyn_start_ofs:
 //				.word __rel_dyn_start - bootcode
