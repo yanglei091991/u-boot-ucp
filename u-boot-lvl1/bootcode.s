@@ -93,13 +93,8 @@ bootcode:
                 // Enable interrupts
                 cpsie   ifa
 
-                .ifdef IK_MODE
-                // All CPUs start the test code. The select_cpu function in the integration kit
-                // will determine which CPU run 
-                b       cpu_start
-                .else
-                // Only CPU0 starts the test code.  Other CPUs sleep and will be enabled
-                // in individual tests where required.
+                // Only CPU0 starts  CPU1 sleep , cpu0 will wakeup cpu1 
+                // cpu1 alive and enter into suspend state, wait sys_ctrl reg point
                 mrc     p15, 0, r0, c0, c0, 5   // Read MPIDR
                 ands    r0, r0, #0xFF           // r0 == CPU number
                 cmp     r0, #1                  // cpu1 run
@@ -113,7 +108,6 @@ bootcode:
                 str r1, [r3]
                 // cpu1 wakeup end
                 b     cpu_start
-                .endif
 
                 // If the CPU is not CPU0 then enter WFI
 //wfi_loop:       wfi
