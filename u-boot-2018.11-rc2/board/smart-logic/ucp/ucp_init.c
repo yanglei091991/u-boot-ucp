@@ -22,9 +22,6 @@
 #define SDIO_BASE	0x02050000	
 #endif
 
-#define _READ_INTERFACE
-#include "copy_image.h"
-
 DECLARE_GLOBAL_DATA_PTR;
 #define CONFIG_SYS_TIMER_COUNTER 0x031d0004
 static struct systimer *systimer_base = (struct systimer *)0x031d0000;
