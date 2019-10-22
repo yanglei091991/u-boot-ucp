@@ -369,17 +369,31 @@ static int poll_transfer(struct dw_spi_priv *priv)
 	return 0;
 }
 
-static void external_cs_manage(struct udevice *dev, bool on)
-{
-#if defined(CONFIG_DM_GPIO) && !defined(CONFIG_SPL_BUILD)
-	struct dw_spi_priv *priv = dev_get_priv(dev->parent);
+#define   GPIOADDR_BASE    0x02118000
+#define   gpio_swportb_dr     (*(volatile unsigned int *)(GPIOADDR_BASE+0x00C)) //GPIO 
+#define   GPIO_Pin_12         (0x00001000)  /*!< Pin 12 selected */
 
-	if (!dm_gpio_is_valid(&priv->cs_gpio))
-		return;
-
-	dm_gpio_set_value(&priv->cs_gpio, on ? 1 : 0);
+static void external_cs_manage(struct udevice *dev, bool high)
+ {
+#if 0
+ #if defined(CONFIG_DM_GPIO) && !defined(CONFIG_SPL_BUILD)
+ 	struct dw_spi_priv *priv = dev_get_priv(dev->parent);
+ 
+@@ -379,9 +392,20 @@ static void external_cs_manage(struct udevice *dev, bool on)
+ 
+ 	dm_gpio_set_value(&priv->cs_gpio, on ? 1 : 0);
+ #endif
 #endif
-}
+#if 1
+     unsigned int value;
+     value = gpio_swportb_dr;
+     if(high)
+       value |= GPIO_Pin_12;
+     else
+       value &= (~GPIO_Pin_12); 
+     gpio_swportb_dr = value;
+#endif
+ }
 
 static int dw_spi_xfer(struct udevice *dev, unsigned int bitlen,
 		       const void *dout, void *din, unsigned long flags)

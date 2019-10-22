@@ -23,6 +23,10 @@
 //???
 #define CONFIG_SYS_LOAD_ADDR	0x20000000
 
+//#define CONFIG_ENV_SPI_MODE SPI_MODE_3
+//#define CONFIG_DEFAULT_SPI_MODE SPI_MODE_3
+#define CONFIG_ENV_SECT_SIZE		0x500
+
 /* allow to overwrite serial and ethaddr */
 //???
 #define CONFIG_ENV_OVERWRITE
@@ -50,6 +54,7 @@
 #endif
 
 
+#define CONFIG_MTD_SPI_NAND 1
 /* NS16550 Serial Configuration */
 #define CONFIG_SYS_NS16550
 #define CONFIG_SYS_NS16550_SERIAL

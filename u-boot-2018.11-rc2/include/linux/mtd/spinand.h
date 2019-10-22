@@ -39,11 +39,22 @@
 		   SPI_MEM_OP_NO_DUMMY,					\
 		   SPI_MEM_OP_NO_DATA)
 
+#if  0
 #define SPINAND_READID_OP(ndummy, buf, len)				\
 	SPI_MEM_OP(SPI_MEM_OP_CMD(0x9f, 1),				\
 		   SPI_MEM_OP_NO_ADDR,					\
 		   SPI_MEM_OP_DUMMY(ndummy, 1),				\
 		   SPI_MEM_OP_DATA_IN(len, buf, 1))
+#else
+
+#define SPINAND_READID_OP(ndummy, buf, len)				\
+	SPI_MEM_OP(SPI_MEM_OP_CMD(0x9f, 1),				\
+		   SPI_MEM_OP_ADDR(1, 0x0, 1),					\
+		   SPI_MEM_OP_DUMMY(ndummy, 1),				\
+		   SPI_MEM_OP_DATA_IN(len, buf, 1))
+
+#endif
+
 
 #define SPINAND_SET_FEATURE_OP(reg, valptr)				\
 	SPI_MEM_OP(SPI_MEM_OP_CMD(0x1f, 1),				\

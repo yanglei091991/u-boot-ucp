@@ -29,6 +29,8 @@ DECLARE_GLOBAL_DATA_PTR;
 #define CONFIG_SYS_TIMER_COUNTER 0x031d0004
 static struct systimer *systimer_base = (struct systimer *)0x031d0000;
 
+void  spi2_ssn_gpio_init(void);
+
  void ucp_timer_init(void)
 {
 	/*
@@ -75,6 +77,7 @@ int board_init(void)
 //	{
 //	return false;  
 //	}
+    spi2_ssn_gpio_init();
 
 	return 0;
 }
@@ -111,4 +114,42 @@ int board_mmc_getcd(struct mmc *mmc)
 	struct dwmci_host *host = mmc->priv;
 
 	return !(dwmci_readl(host, DWMCI_CDETECT) & 1);
+}
+
+#define   PINMUX_BASE      0x020e0000
+#define   GPIOADDR_BASE    0x02118000
+
+#define   SPI2_SSN_GPIO    (0x3)   /* pad61	SPI2_SSN_GPIO */
+#define   PINMUX_1A0       (*(volatile unsigned int *)(PINMUX_BASE+0x1a0))
+
+#define   gpio_swportb_dr     (*(volatile unsigned int *)(GPIOADDR_BASE+0x00C)) //GPIO 
+#define   gpio_swportb_ddr    (*(volatile unsigned int *)(GPIOADDR_BASE+0x010)) //GPIO 
+#define   gpio_swportb_ctl    (*(volatile unsigned int *)(GPIOADDR_BASE+0x014)) //GPIO
+#define   GPIO_Pin_12         (0x00001000)  /*!< Pin 12 selected */
+
+/* pad61	SPI2_SSN pin CP_GPIOB12 */
+void  spi2_ssn_gpio_init(void)
+{
+    unsigned int val,src;
+    
+    val = SPI2_SSN_GPIO;    
+    src = PINMUX_1A0& 0xFFFFFFFC;
+    PINMUX_1A0 = (val|src);
+
+    gpio_swportb_ddr |= GPIO_Pin_12;     /* Data Direction: 1--output, 0--input */
+    gpio_swportb_dr =  GPIO_Pin_12;      /* output level  */
+    gpio_swportb_ctl =0;
+}
+
+//spi2_ssn_gpio_set_value(1)
+//spi2_ssn_gpio_set_value(0)
+void  spi2_ssn_gpio_set_value(unsigned char high)
+{
+     unsigned char  value;
+     value = gpio_swportb_dr;
+     if(high)
+       value |= GPIO_Pin_12;
+     else
+       value &= (~GPIO_Pin_12); 
+     gpio_swportb_dr = value;
 }
