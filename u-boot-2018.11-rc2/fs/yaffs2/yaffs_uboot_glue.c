@@ -157,6 +157,7 @@ static int yaffs_regions_overlap(int a, int b, int x, int y)
 		(x <= b && b <= y);
 }
 
+extern struct mtd_info *g_mtd_info;
 void cmd_yaffs_devconfig(char *_mp, int flash_dev,
 			int start_block, int end_block)
 {
@@ -166,7 +167,11 @@ void cmd_yaffs_devconfig(char *_mp, int flash_dev,
 	char *mp = NULL;
 	struct nand_chip *chip;
 
-	mtd = get_nand_dev_by_index(flash_dev);
+//	mtd = get_nand_dev_by_index(flash_dev);
+  mtd = g_mtd_info;
+  if (!mtd)
+    printf("warning: empty global mtd_info!!!!!!\n");
+
 	if (!mtd) {
 		pr_err("\nno NAND devices available\n");
 		return;
@@ -262,7 +267,8 @@ void cmd_yaffs_dev_ls(void)
 		dev = yaffs_next_dev();
 		if (!dev)
 			return;
-		flash_dev = nand_mtd_to_devnum(dev->driver_context);
+//		flash_dev = nand_mtd_to_devnum(dev->driver_context);
+		flash_dev = 0;
 		printf("%-10s %5d 0x%05x 0x%05x %s",
 			dev->param.name, flash_dev,
 			dev->param.start_block, dev->param.end_block,

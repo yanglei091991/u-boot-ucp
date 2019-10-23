@@ -55,6 +55,7 @@
 
 
 #define CONFIG_MTD_SPI_NAND 1
+#define CONFIG_SYS_MAX_NAND_DEVICE 1
 /* NS16550 Serial Configuration */
 #define CONFIG_SYS_NS16550
 #define CONFIG_SYS_NS16550_SERIAL
@@ -147,7 +148,6 @@
 //#define CONFIG_EXT4_WRITE
 //#define CONFIG_CMD_EXT4
 //#define CONFIG_CMD_EXT4_WRITE
-#define CONFIG_CMD_FS_GENERIC
 
 #if 0
 /*

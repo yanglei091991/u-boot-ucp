@@ -1138,11 +1138,14 @@ static void spinand_cleanup(struct spinand_device *spinand)
 	kfree(spinand->scratchbuf);
 }
 
+extern struct mtd_info *g_mtd_info;
+struct mtd_info *g_mtd_info;
 static int spinand_probe(struct udevice *dev)
 {
 	struct spinand_device *spinand = dev_get_priv(dev);
 	struct spi_slave *slave = dev_get_parent_priv(dev);
 	struct mtd_info *mtd = dev_get_uclass_priv(dev);
+  g_mtd_info = mtd;
 	struct nand_device *nand = spinand_to_nand(spinand);
 	int ret;
 
