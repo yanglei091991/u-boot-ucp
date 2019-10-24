@@ -14,7 +14,7 @@
 #include <linux/compiler.h>
 #include <part.h>
 #else
-#include "ucp_common.h"
+#include "sd_common.h"
 #endif
 
 

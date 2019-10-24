@@ -10,7 +10,7 @@
 //#include <asm/io.h>
 //#include <mmc.h>
 
-#include "ucp_common.h"
+#include "sd_common.h"
 #include "mmc.h"
 
 #define DWMCI_CTRL		0x000

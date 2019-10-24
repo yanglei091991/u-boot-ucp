@@ -2,11 +2,6 @@
 #define CONFIG_PLL_H
 #include <stdint.h>
 
-#define BIT12           (0x1 << 12ul)
-#define BIT14           (0x1 << 14ul)
-#define BIT16           (0x1 << 16ul)
-#define BIT18           (0x1 << 18ul)
-
 // config pll reg
 #define CRG_BASE_ADDR   0x03670000
 #define PLL1_CTRL       (*((volatile uint32_t *) (CRG_BASE_ADDR + 0x05*4)))

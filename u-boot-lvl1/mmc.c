@@ -25,7 +25,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "ucp_common.h"
 #include "errno.h"
 //#include "mmc_private.h"
 #include "mmc.h"

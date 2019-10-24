@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-#include "ucp_common.h"
+#include "sd_common.h"
 #include "mmc.h"
 #include "dwmmc.h"
 
@@ -132,7 +132,7 @@ ulong get_timer(ulong usec)
 	}
 }
 
- void ucp_timer_init(void)
+ void timer_init(void)
 {
 	/*
 	 * Set Timer0 to be:
@@ -143,7 +143,7 @@ ulong get_timer(ulong usec)
 }
 
 
-int ucp_sdio_init(void)
+int sd_init(void)
 {
     struct dwmci_host *host = &ucp_host;
     int err=0;
@@ -230,29 +230,14 @@ void print_mmcinfo(struct mmc *mmc)
 
 }
 
-
-
 #endif
 
-void  ucp_sdio_main(void)
+void  sd_fs_read(void) // sd driver file system read
 {
-   //memset(&ucp_mmc,0,sizeof(struct mmc));
-   
-   //ucp_mmc.dsr_imp		= 0;
-   //ucp_mmc.dsr			= 0xffffffff;
-   //ucp_mmc.cfg->host_caps =0;
-
-   ucp_timer_init();
-   
+   timer_init();
    test_timer();
-   ucp_sdio_init();
+   sd_init();
    print_mmcinfo(&ucp_mmc);
-
-//   mmc_bread(0, 1,(void *)0x40000000);
-
-//   mmc_bread(0, 3,(void *)0x41000000);
-
-//   mmc_bread(1, 3,(void *)0x42000000);
 
    void loadfile(void *addr);
    loadfile((void*)0x04e60000);

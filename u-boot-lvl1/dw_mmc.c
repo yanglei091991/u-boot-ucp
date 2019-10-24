@@ -16,7 +16,7 @@
 #include <asm-generic/errno.h>
 #else
 #include <stdio.h>
-#include "ucp_common.h"
+#include "sd_common.h"
 #include "errno.h"
 #include "mmc.h"
 #include "dwmmc.h"

@@ -1,5 +1,5 @@
-
-
+#ifndef BOOT_READ_MODE_H
+#define BOOT_READ_MODE_H
 
 //SYSCFG
 #define SYSCFG_BASE_ADDR       0x03690000
@@ -61,5 +61,6 @@
 #define IS_ROM_BOOT    0  
 #define IS_ROM_GPMC    1
 
+void  read_uboot_mode(void);
 
-
+#endif // BOOT_READ_MODE_H

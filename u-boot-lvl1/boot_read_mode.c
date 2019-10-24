@@ -1,9 +1,7 @@
+#include "boot_read_mode.h"
+#include "sd_common.h"
+#include "uart.h"
 
-
-#include  "ucp_sysctrl.h"
-        
-
-void  ucp_sdio_main(void);
 void  print_hex(unsigned char hex);
 
 void  output_boot_cfg(void)
@@ -20,7 +18,7 @@ void  output_boot_cfg(void)
 
 
 /* internal ROM BOOT */
-void  ucp_read_uboot(void)
+void  read_uboot_mode(void)
 {
     unsigned  int  boot_cfg;
     
@@ -32,12 +30,12 @@ void  ucp_read_uboot(void)
       /* init spi, read uboot from spi flash */
 
       /* check boot success or not */
-	  ucp_sdio_main();
+	  sd_fs_read();
     }
     else
     { /* uboot from SDIO */
       /* init sdio, read uboot from sd card */     
-       ucp_sdio_main();
+       sd_fs_read();
 
       /* check boot success or not */
       

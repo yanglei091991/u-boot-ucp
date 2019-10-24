@@ -1,7 +1,7 @@
 
 
-#ifndef _UCP_COMMON_H_
-#define _UCP_COMMON_H_
+#ifndef SD_COMMON_H_
+#define SD_COMMON_H_
 
 #define   SELF_TEST
 
@@ -87,7 +87,10 @@ struct dw_timer {
 };
 
 
+ void timer_init(void);
+int sd_init(void);
+void  sd_fs_read(void); // sd driver file system read
 
 
-#endif
+#endif //SD_COMMON_H_
 
