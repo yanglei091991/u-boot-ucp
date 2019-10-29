@@ -93,6 +93,11 @@ bootcode:
                 // Enable interrupts
                 cpsie   ifa
 
+                //A53 to enable SMPEN 
+                mrrc  p15,1,r0,r1,c15
+                orr r0,r0,#0x40
+                mcrr p15,1,r0,r1,c15
+
                 // Only CPU0 starts  CPU1 sleep , cpu0 will wakeup cpu1 
                 // cpu1 alive and enter into suspend state, wait sys_ctrl reg point
                 mrc     p15, 0, r0, c0, c0, 5   // Read MPIDR
