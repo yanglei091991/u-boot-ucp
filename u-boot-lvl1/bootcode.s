@@ -27,6 +27,13 @@ bootcode:
                 mov     r11, #0
                 mov     r12, #0
                 mov     r14, #0
+                // CRG reg init
+                ldr     r0,  =0x00000B05
+                ldr     r1,  =0x03670060
+                str     r0, [r1]
+                ldr     r0,  =0xFFFFFFFF
+                ldr     r1,  =0x0367005C
+                str     r0, [r1]
 
                 // -----------------------------------------------------------------------------
                 // Variable definitions
@@ -92,11 +99,6 @@ bootcode:
                 isb sy
                 // Enable interrupts
                 cpsie   ifa
-
-                //A53 to enable SMPEN 
-                mrrc  p15,1,r0,r1,c15
-                orr r0,r0,#0x40
-                mcrr p15,1,r0,r1,c15
 
                 // Only CPU0 starts  CPU1 sleep , cpu0 will wakeup cpu1 
                 // cpu1 alive and enter into suspend state, wait sys_ctrl reg point

@@ -70,7 +70,7 @@ int main()
   }
 
 // config pll clock
-   config_pll();
+//   config_pll();
 
 // init interface 
 #if  0
