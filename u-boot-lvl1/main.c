@@ -88,9 +88,9 @@ int main()
 //  add read_id() select read_interface of the manufacturers
 //  volatile int read_arr_index = 0;
 
-  unsigned int *src = (unsigned int*)nandflash_startAddr;
-  unsigned char *dest = (unsigned char*)copy_addr;
-  unsigned int boot_size = 0;
+//  unsigned int *src = (unsigned int*)nandflash_startAddr;
+//  unsigned char *dest = (unsigned char*)copy_addr;
+//  unsigned int boot_size = 0;
 
 //  if(copy_boot2_to_ram(src,dest,&boot_size) == false)
 //  {

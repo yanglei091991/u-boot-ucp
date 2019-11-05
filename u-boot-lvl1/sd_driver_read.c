@@ -42,10 +42,7 @@ struct mmc *mmc_create(const struct mmc_config *cfg, void *priv)
 
 //ulong mmc_bread(struct blk_desc *block_dev, u32 start, u32 blkcnt,void *dst)
 u32 mmc_bread(u32 start, u32 blkcnt,void *dst)
-{
-#ifndef  SELF_TEST
-	int dev_num = block_dev->devnum;
-#endif	
+{	
 	int err;
 	u32 cur, blocks_todo = blkcnt;
     struct mmc *mmc = &ucp_mmc;
@@ -174,8 +171,9 @@ int sd_init(void)
 	  debug("%s: Failed in mmc_init(). \n\r", __func__);
 }
 
-#if  1 /* only test */
+#if 0
 void udelay(unsigned long usec);
+
 void  test_timer(void)
 {
     ulong start;
@@ -187,8 +185,7 @@ void  test_timer(void)
      udelay(100*i);
      stop = get_timer(start);
      debug("delay is %d:\n\r",stop);
-   	}
-    
+   	}    
 }
 
 void print_mmcinfo(struct mmc *mmc)
@@ -227,7 +224,6 @@ void print_mmcinfo(struct mmc *mmc)
 	puts("Erase Group Size: ");
 	print_size(((u64)mmc->erase_grp_size) << 9, "\n");
 #endif
-
 }
 
 #endif
@@ -235,9 +231,9 @@ void print_mmcinfo(struct mmc *mmc)
 void  sd_fs_read(void) // sd driver file system read
 {
    timer_init();
-   test_timer();
+   //test_timer();
    sd_init();
-   print_mmcinfo(&ucp_mmc);
+   //print_mmcinfo(&ucp_mmc);
 
    void loadfile(void *addr);
    loadfile((void*)0x04e60000);

@@ -1,5 +1,6 @@
 
-
+#ifndef PINMUX_H
+#define PINMUX_H
 
 
 #define   PINMUX_BASE      0x020d8000
@@ -54,9 +55,9 @@
 #define   CRG_BASE     0x03670000
 #define   DDR_ENABLE   0x60
 
+void  spi0_pin_init(void);
 
-
-
+#endif
 
 
 

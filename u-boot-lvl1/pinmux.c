@@ -39,6 +39,7 @@ void  spi2_holdwp_gpio_pin_init(void)
     PINMUX_1A0 = (val|src);     
     
 }
+#endif
 
 /*
 pad69	SPI0_SSN
@@ -54,7 +55,8 @@ void  spi0_pin_init(void)
     src = PINMUX_1A0 & 0xFF00FFFF;
     PINMUX_1A0 = (val|src);
 }
-#endif
+
+
 
 /*
 pad27	SPI2_SSN
@@ -62,6 +64,7 @@ pad28	SPI2_CLK
 pad29	SPI2_MISO
 pad30	SPI2_MOSI
 */
+#if  0 
 void  spi2_pin_init(void)
 {
     unsigned int val,src;
@@ -99,7 +102,7 @@ void  pinmux_init(void)
     LED_gpio_pin_init();
 
 }
-
+#endif
 
 
 

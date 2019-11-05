@@ -53,14 +53,16 @@
 #define     BIT30                   (0x1<<30ul)
 #define     BIT31                   (0x1<<31ul)
 
-
-#define  BOOT_CFG_SYNC    BIT3
+/* 一级boot-- 0:BOOT_ROM方式启动, 1:GPMC 方式启动（FLASH/SRAM）*/
+#define  BOOT_CFG_SYNC    BIT3   
+/* 二级boot--0:系统从SDIO启动, 1:系统从SPI0启动 */
 #define  BOOT_CTL_SYNC4   BIT4
+/* boot_cfg_sync=1时：控制GPMC的boot媒介, 0：async SRAM,  1:  nor Flash  */
 #define  BOOT_CTL_SYNC5   BIT5
 
 #define IS_ROM_BOOT    0  
 #define IS_ROM_GPMC    1
 
-void  read_uboot_mode(void);
+unsigned char  read_uboot_mode(void);
 
 #endif // BOOT_READ_MODE_H

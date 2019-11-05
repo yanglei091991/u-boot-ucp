@@ -10,6 +10,7 @@
 #include <stdbool.h>
 #include "spi_nand_flash.h"
 #include "crc16_test.h"
+#include "uart.h"
 
 #define page 2048
 enum{
@@ -21,7 +22,7 @@ image_dts
 #define nandflash_startAddr  (page * uboot_page)
 #define Block_Size 0x20000 // 128KB
 #define head_len 0x800 // 2k
-#define copy_addr 0x10800000
+#define copy_addr 0x04e60000
 enum{
 boot2 = 0,
 ddr,

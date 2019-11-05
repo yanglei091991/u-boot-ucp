@@ -1,4 +1,5 @@
-
+#ifndef UART_H
+#define UART_H
 #if 0
 #define UART_BASE_0      0x42000000      /* UART 0 */
 
@@ -184,5 +185,5 @@ struct mapu_uart {
 void   boot_uart_init(void);
 void Uart_Printf(unsigned char *string);
 
-
+#endif
 

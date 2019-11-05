@@ -5,9 +5,10 @@ bool copy_boot2_to_ram(unsigned int *src, unsigned char *dest, unsigned int *boo
   unsigned int rowAddr = ((unsigned int)src&0x1FFFF800)>>11;
   unsigned int colAddr = (unsigned int)src&0x7FF;
 //  unsigned char *SM5_Addr = (unsigned char*)0x020ceff0; // SM5 Addr store nandflash head info
-  unsigned char SM5_Addr[16] = {0}; 
+  unsigned char SM5_Addr[32] = {0}; 
 //  unsigned int len = 0x800; // 2k
-  nandflash_read_arr[read_arr_index](rowAddr, colAddr, SM5_Addr, head_len);
+  if(nandflash_read_arr[read_arr_index](rowAddr, colAddr, SM5_Addr, sizeof(SM5_Addr)) != 0)
+      Uart_Printf("spi read head nand error! \n\r");
 
   NandFlash_Head nand_head;
   volatile unsigned short int *pNandHead = (volatile unsigned short int*)SM5_Addr;
@@ -32,7 +33,8 @@ bool copy_boot2_to_ram(unsigned int *src, unsigned char *dest, unsigned int *boo
     srcAddr = (unsigned int)(*(pNandHead + i));
     rowAddr = (unsigned int)srcAddr << 6;
     colAddr = 0x0;
-    nandflash_read_arr[read_arr_index](rowAddr, colAddr, tmp_dest, Block_Size);
+    if(nandflash_read_arr[read_arr_index](rowAddr, colAddr, tmp_dest, Block_Size) != 0)
+      Uart_Printf("spi read block nand error! \n\r");
     tmp_dest = tmp_dest + Block_Size;
   }
 
@@ -41,7 +43,8 @@ bool copy_boot2_to_ram(unsigned int *src, unsigned char *dest, unsigned int *boo
     srcAddr = (unsigned int)(*(pNandHead + nand_head.byte_size/Block_Size));
     rowAddr = (unsigned int)srcAddr << 6;
     colAddr = 0x0;
-    nandflash_read_arr[read_arr_index](rowAddr, colAddr, tmp_dest, nand_head.byte_size%Block_Size);
+    if(nandflash_read_arr[read_arr_index](rowAddr, colAddr, tmp_dest, nand_head.byte_size%Block_Size) != 0)
+      Uart_Printf("spi read remainder block nand error! \n\r");
   }
 
   unsigned int dest_file_crc = crc32(dest, nand_head.byte_size);
