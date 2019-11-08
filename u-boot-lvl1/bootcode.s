@@ -27,13 +27,6 @@ bootcode:
                 mov     r11, #0
                 mov     r12, #0
                 mov     r14, #0
-                // CRG reg init
-                ldr     r0,  =0x00000B05
-                ldr     r1,  =0x03670060
-                str     r0, [r1]
-                ldr     r0,  =0xFFFFFFFF
-                ldr     r1,  =0x0367005C
-                str     r0, [r1]
 
                 // -----------------------------------------------------------------------------
                 // Variable definitions
@@ -100,12 +93,24 @@ bootcode:
                 // Enable interrupts
                 cpsie   ifa
 
+                //A53 to enable SMPEN 
+                mrrc  p15,1,r0,r1,c15
+                orr r0,r0,#0x40
+                mcrr p15,1,r0,r1,c15
+                
                 // Only CPU0 starts  CPU1 sleep , cpu0 will wakeup cpu1 
                 // cpu1 alive and enter into suspend state, wait sys_ctrl reg point
                 mrc     p15, 0, r0, c0, c0, 5   // Read MPIDR
                 ands    r0, r0, #0xFF           // r0 == CPU number
                 cmp     r0, #1                  // cpu1 run
                 beq     cpu1_jump
+                // CRG reg init
+                ldr     r0,  =0x00000B05
+                ldr     r1,  =0x03670060
+                str     r0, [r1]
+                ldr     r0,  =0xFFFFFFFF
+                ldr     r1,  =0x0367005C
+                str     r0, [r1]
                 // cpu1 wakeup start
                 ldr r1, =CPU1_RESET_ADDR
                 ldr r1, [r1]
@@ -134,6 +139,7 @@ bootcode:
 
 /**********************************************/
 wfe_lable:
+                wfe
                 wfe
 cpu1_jump:
                 ldr r1, =CPU1_SYS_CTRL
@@ -210,6 +216,9 @@ cpu_start:
                 mov r2, #0
                 ldr r0, =SM5_START_ADDR // 128KB
 				ldr r1, =SM5_END_ADDR
+                bl copy_loop
+                ldr r0, =SM4_START_ADDR // 64KB
+				ldr r1, =SM4_END_ADDR
                 bl copy_loop
                 ldr r0, =SM03_START_ADDR // 1M
 				ldr r1, =SM03_END_ADDR
