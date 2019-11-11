@@ -37,8 +37,14 @@ void config_pll()
     PLL1_CTRL |= 1;
     // PLL3 enable
     PLL3_CTRL |= 1;
+    // add delay(50us);
     // wait pll1 and pll3 locked
-    while((PLL_SEL_CTRL & (BIT12 | BIT14)) != (BIT12 | BIT14));
+    while((PLL_SEL_CTRL & (BIT12 | BIT14)) != (BIT12 | BIT14))
+    {
+      // delay(1s);
+      // if((PLL_SEL_CTRL & (BIT12 | BIT14)) != (BIT12 | BIT14))
+      //   return;
+    }
     // switch xtal to pll
     PLL_SEL_CTRL |= 0x400;
     PLL_SEL_CTRL |= 0x100;
