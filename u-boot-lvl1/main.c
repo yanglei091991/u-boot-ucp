@@ -82,8 +82,9 @@ int main()
 
 #endif
   boot_uart_init();
+#ifdef  UART
   Uart_Printf("UART init success! \n\r");
-
+#endif
   read_uboot_mode();
 //  add read_id() select read_interface of the manufacturers
 //  volatile int read_arr_index = 0;

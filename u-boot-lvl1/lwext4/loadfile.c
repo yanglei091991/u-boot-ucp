@@ -3,13 +3,17 @@
 #include <stdio.h>
 #include "mmc_dev.h"
 
+#ifdef  UART
+#include "../uart.h"
+#endif
+
 #define BUFSZ 4096
 
-static void die(void)
-{
-	while (1)
-		;
-}
+//static void die(void)
+//{
+//	while (1)
+//		;
+//}
 
 void loadfile(void *addr)
 {
@@ -20,24 +24,32 @@ void loadfile(void *addr)
 
 	r = ext4_device_register(blk, "mmc");
 	if (r != EOK) {
-		die();
+#ifdef  UART
+       Uart_Printf("BOOT1 ext4 device register error! \n\r");
+#endif
 	}
 
 	r = ext4_mount("mmc", "/", true /* read only */);
 	if (r != EOK) {
-		die();
-	}
+#ifdef  UART
+       Uart_Printf("BOOT1 ext4 mount error! \n\r");
+#endif
+    }
 
 	r = ext4_fopen2(&bootfile, "/u-boot.bin", O_RDONLY);
 	if (r != EOK) {
-		die();
-	}
+#ifdef  UART
+        Uart_Printf("BOOT2 SD card! \n\r");
+#endif
+    }
 
 	while (size) {
 		r = ext4_fread(&bootfile, addr, BUFSZ, &size);
-//		if (r != EOK) {
-//			die();
-//		}
+		if (r != EOK) {
+#ifdef  UART
+            Uart_Printf("BOOT2 SD card! \n\r");
+#endif
+        }
 		addr += size;
 	}
 
