@@ -6,13 +6,14 @@
 #include <common.h>
 #include <asm/io.h>
 #include <asm/arch/clock.h>
-#include <asm/arch/func_lib.h>
 #include <linux/errno.h>
 #include <mmc.h>
 #include <miiphy.h>
 #include <netdev.h>
 #include <asm/arch-armv7/systimer.h>
 #include <asm/mach-types.h>
+#include "ucp_ddr_dccm.h"
+#include "ucp_ddr_iccm.h"
 
 #ifdef CONFIG_MMC
 #include <common.h>
@@ -22,11 +23,20 @@
 #define SDIO_BASE	0x02050000	
 #endif
 
+#define DCCM_BASE_ADDR 0x020c0000
+#define ICCM_BASE_ADDR 0x020d0000
+
 DECLARE_GLOBAL_DATA_PTR;
 #define CONFIG_SYS_TIMER_COUNTER 0x031d0004
 static struct systimer *systimer_base = (struct systimer *)0x031d0000;
 
 void  spi2_ssn_gpio_init(void);
+
+void copy_ddr_ref(void)
+{
+    memcpy((int*)DCCM_BASE_ADDR, dccm_arr, sizeof(dccm_arr));
+    memcpy((int*)ICCM_BASE_ADDR, iccm_arr, sizeof(iccm_arr));
+}
 
  void ucp_timer_init(void)
 {
@@ -57,25 +67,12 @@ int board_init(void)
 {
 	gd->bd->bi_boot_params = PHYS_SDRAM_1+ 0xb000000;
 	gd->bd->bi_arch_number = MACH_TYPE_UCP;
-//    ucp_ddr_init();
 	ucp_timer_init();
-
-//	unsigned int *src = (unsigned int*)(int)(2048*6); // nand flash image addr
-//	unsigned char *dest = (unsigned char*)0x20000000; // ddr image addr
-//
-//	if(copy_image_dts_to_ram(src, dest) == false)
-//	{
-//	return false;  
-//	}
-//	src = (unsigned int*)(int)(2048*7); // nand flash dts addr
-//	dest = (unsigned char*)0x28000000; // ddr dts addr
-//	if(copy_image_dts_to_ram(src, dest) == false)
-//	{
-//	return false;  
-//	}
     spi2_ssn_gpio_init();
+    copy_ddr_ref();
+//    ddr_init();
 
-	return 0;
+    return 0;
 }
 
 int board_mmc_init(bd_t *bis)
@@ -149,3 +146,4 @@ void  spi2_ssn_gpio_set_value(unsigned char high)
        value &= (~GPIO_Pin_12); 
      gpio_swportb_dr = value;
 }
+
