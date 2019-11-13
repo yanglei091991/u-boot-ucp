@@ -92,12 +92,13 @@
 
 /* Environment organization */
 //#define CONFIG_ENV_IS_IN_FLASH		0
+#define CONFIG_ENV_IS_IN_EXT4   1
 #define CONFIG_ENV_OFFSET		(6 * 64 * 1024)
-#define CONFIG_ENV_SIZE			(8 * 1024)
+#define CONFIG_ENV_SIZE			(16 * 1024)
 //#define CONFIG_SYS_MMC_ENV_DEV		1
 
 /* Size of malloc() pool */
-#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 20 * 1024 * 1024)
+#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 2 * 1024 * 1024)
 
 
 #define CONFIG_CMDLINE_EDITING		1
