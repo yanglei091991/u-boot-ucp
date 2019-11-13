@@ -100,6 +100,24 @@ u32 mmc_bread(u32 start, u32 blkcnt,void *dst)
 	return blkcnt;
 }
 
+/* delay = usec us, usec < 85000000(85s)
+*/
+void us_delay(unsigned int usec)
+{
+    unsigned int value,status;
+
+    writel(0, &systimer_base->timer0control);
+    value = usec*BASE_US;
+    writel(value, &systimer_base->timer0load);
+	writel(3, &systimer_base->timer0control);
+
+    do{    
+       status = readl(&systimer_base->timer0IntStatus);
+    }while(!status);	
+	writel(0, &systimer_base->timer0control);	
+}
+
+
 /* 返回值单位us  */
 ulong get_timer(ulong usec)
 {
@@ -115,7 +133,6 @@ ulong get_timer(ulong usec)
        value = readl(&systimer_base->timer0value);
        return (value/BASE_US);
     }
-
 #endif
       
     base = (usec*BASE_US);
@@ -133,7 +150,7 @@ ulong get_timer(ulong usec)
 {
 	/*
 	 * Set Timer0 to be:
-	 *   Enabled, free running, no interrupt, user-mode
+	 *   Enabled, free running, no interrupt, user-mode, Timer down counter
 	 */
 	writel(SYSTIMER_RELOAD, &systimer_base->timer0load);
 	writel(5, &systimer_base->timer0control);
@@ -170,6 +187,7 @@ int sd_init(void)
 	if(err)
 	  debug("%s: Failed in mmc_init(). \n\r", __func__);
 }
+
 
 #if 0
 void udelay(unsigned long usec);

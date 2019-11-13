@@ -20,7 +20,7 @@
 #include "errno.h"
 #include "mmc.h"
 #include "dwmmc.h"
-
+#include "sd_common.h"
 #endif
 
 #define PAGE_SIZE 4096
@@ -111,7 +111,7 @@ static int dwmci_fifo_ready(struct dwmci_host *host, u32 bit, u32 *len)
 
 	*len = dwmci_readl(host, DWMCI_STATUS);
 	while (--timeout && (*len & bit)) {
-		udelay(200);
+		us_delay(200);
 		*len = dwmci_readl(host, DWMCI_STATUS);
 	}
 
@@ -368,7 +368,7 @@ static int dwmci_send_cmd(struct mmc *mmc, struct mmc_cmd *cmd,
 		}
 	}
 
-	udelay(100);
+	us_delay(100);
 
 	return ret;
 }

@@ -28,7 +28,7 @@
 #include "errno.h"
 //#include "mmc_private.h"
 #include "mmc.h"
-
+#include "sd_common.h"
 
 #endif
 
@@ -108,19 +108,6 @@ const char *mmc_mode_name(enum bus_mode mode)
 #if  0
 void udelay(unsigned long usec)
 {
-	ulong kv;
-
-	do {
-		WATCHDOG_RESET();
-		kv = usec > CONFIG_WD_PERIOD ? CONFIG_WD_PERIOD : usec;
-		__udelay (kv);
-		usec -= kv;
-	} while(usec);
-}
-
-#endif
-void udelay(unsigned long usec)
-{
    unsigned long  utime;
    utime = usec*100;
    while(utime--);
@@ -132,7 +119,7 @@ static inline void mdelay(unsigned long msec)
 	while (msec--)
 		udelay(1000);
 }
-
+#endif
 
 static uint mmc_mode2freq(struct mmc *mmc, enum bus_mode mode)
 {
@@ -222,7 +209,7 @@ int mmc_send_status(struct mmc *mmc, int timeout)
 		if (timeout-- <= 0)
 			break;
 
-		udelay(1000);
+		us_delay(1000);
 	}
 
 	mmc_trace_state(mmc, &cmd);
@@ -388,7 +375,7 @@ static int mmc_go_idle(struct mmc *mmc)
 	struct mmc_cmd cmd;
 	int err;
 
-	udelay(1000);
+	us_delay(1000);
 
 	cmd.cmdidx = MMC_CMD_GO_IDLE_STATE;
 	cmd.cmdarg = 0;
@@ -399,7 +386,7 @@ static int mmc_go_idle(struct mmc *mmc)
 	if (err)
 		return err;
 
-	udelay(2000);
+	us_delay(2000);
 
 	return 0;
 }
@@ -435,7 +422,7 @@ static int mmc_switch_voltage(struct mmc *mmc, int signal_voltage)
 	 */
 	err = mmc_wait_dat0(mmc, 0, 100);
 	if (err == -ENOSYS)
-		udelay(100);
+		us_delay(100);
 	else if (err)
 		return -ETIMEDOUT;
 
@@ -459,7 +446,7 @@ static int mmc_switch_voltage(struct mmc *mmc, int signal_voltage)
 	 */
 	err = mmc_wait_dat0(mmc, 1, 1000);
 	if (err == -ENOSYS)
-		udelay(1000);
+		us_delay(1000);
 	else if (err)
 		return -ETIMEDOUT;
 
@@ -513,7 +500,7 @@ static int sd_send_op_cond(struct mmc *mmc, bool uhs_en)
 		if (timeout-- <= 0)
 			return -EOPNOTSUPP;
 
-		udelay(1000);
+		us_delay(1000);
 	}
 
 	if (mmc->version != SD_VERSION_2)
@@ -613,7 +600,7 @@ static int mmc_complete_op_cond(struct mmc *mmc)
 				break;
 			if (get_timer(start) > timeout)
 				return -EOPNOTSUPP;
-			udelay(100);
+			us_delay(100);
 		}
 	}
 #if  0
@@ -2457,7 +2444,7 @@ static int mmc_power_cycle(struct mmc *mmc)
 	 * SD spec recommends at least 1ms of delay. Let's wait for 2ms
 	 * to be on the safer side.
 	 */
-	udelay(2000);
+	us_delay(2000);
 	//return mmc_power_on(mmc);
 }
 

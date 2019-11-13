@@ -16,10 +16,6 @@
 #define GD5F1GQ4RB 	0XC8C1     /* 1Gbit,  B version, 1.8v */
 #define GD5F2GQ4RB 	0XC8C2     /* 2Gbit,  B version, 1.8v */
 
-#define   DELAY_CYCLE     1000*55  
-#define   CPU_FREQ           50               /* 50MHz */
-#define   CPU_NS               (DELAY_CYCLE/CPU_FREQ)     /* ns */
-
 
 #define NAND_SPI_ER_STATUS_P_FAIL       (1 << 3)		//写入失败标记
 #define NAND_SPI_ER_STATUS_E_FAIL       (1 << 2)		//擦除失败标记

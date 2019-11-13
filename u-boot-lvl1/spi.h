@@ -34,9 +34,12 @@ SPI1	  0x02100000
 SPI2	  0x04a00000
 SPI3	  0x04a10000
 */
-//#define SPI_BASE     0x020f8000     //0x42040000
+/* SOC use spio0, fpga test use fpga SPI2 */
+#ifdef  SOC_PRJ
+#define SPI_BASE    0x020f8000      /* SPI0 */
+#else
 #define SPI_BASE    0x04a00000      /* SPI2 */
-
+#endif
 
 #define CTRLR0 	   (*(volatile unsigned int *)(SPI_BASE+0x00))
 #define CTRLR1 	   (*(volatile unsigned int *)(SPI_BASE+0x04))

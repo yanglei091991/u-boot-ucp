@@ -7,7 +7,7 @@
 #include "spi.h"
 #include "spi_nand_flash.h"
 #include "gpio.h"
-
+#include "sd_common.h"
 
 
 #define NAND_SPI_ER_STATUS_P_FAIL       (1 << 3)		//写入失败标记
@@ -21,6 +21,7 @@
 unsigned int  gNandFlashType;
 unsigned char  gFlashSize;
 unsigned char  gRxDat[2048+128];
+
 
 void drv_delay(volatile unsigned int num)
 {
@@ -94,7 +95,7 @@ unsigned char rt_spi_send_then_recv(unsigned char *send_buf,
 
 void spi_init(void)
 {
-  RSVD_2 = 4;
+    RSVD_2 = 4;
 
 	/* diaable  SSI */
 	SSIENR = 0x0;		
@@ -105,10 +106,14 @@ void spi_init(void)
 	 * FRF=0,   00 –- Motorola SPI
 	 */
 	//CTRLR0 = 0x07;      /* DFS=0x7, Data Frame size=8bit  */
-	CTRLR0 = 0xC7;
+	CTRLR0 = 0xC7;    
+	
 	/* Fssi_clk=50MHZ, Fclk_out = Fssi_clk/16 */
-	//BAUDR = 0x10;	     /*  SCKDV= 16 */
-	BAUDR = 200;         /*  SCKDV = 32 */
+#ifdef SOC_PRJ
+	BAUDR = 20;          /*  50MHZ/200=2.5M */
+#else	
+	BAUDR = 200;         /*  50MHZ/200=250k */
+#endif
 
 	//TXFTLR = 0;
 	//RXFTLR = 0;
@@ -303,8 +308,9 @@ unsigned char nandflash_readpage(unsigned int                 page,
 		txbuf[3]=page;
 		rt_spi_send_then_recv(txbuf,4,txbuf,0);				//发送读取页面
 
-    //delay tRD=80us
-    drv_delay(80000/CPU_NS);
+        //delay tRD=80us
+        us_delay(80);
+    
 		/* Wait等待 */
 		nandflash_busy_wait(&stat);
 		if (stat & NAND_SPI_ER_STATUS_OIP) 
@@ -314,18 +320,18 @@ unsigned char nandflash_readpage(unsigned int                 page,
    	{
          return  ECC_ERROR;
     }
-		txbuf[0]=SPI_NAND_READ_FROM_CACHE2_CMD;		//设置0BH快速从缓存读取一个页面数据（地址ADD=1byte dummy+2byte地址+1byte Dummy）
-	//	txbuf[0]=SPI_NAND_READ_FROM_CACHE1_CMD;		//设置03H从缓存读取一个页面数据（与0BH读取地址长度不一样，地址ADD=1byte dummy+2byte地址+）
-		txbuf[1]=data_addr>>8;
-		txbuf[2]=data_addr;
-		txbuf[3]=0x00;
-		rt_spi_send_then_recv(txbuf,4,data,data_len);
-    drv_delay(5000/CPU_NS);
+    
+	txbuf[0]=SPI_NAND_READ_FROM_CACHE2_CMD;
+	txbuf[1]=data_addr>>8;
+	txbuf[2]=data_addr;
+	txbuf[3]=0x00;
+	rt_spi_send_then_recv(txbuf,4,data,data_len);
+    us_delay(5);
     return  DRV_OK;
 
 }
 
-
+#if  0
 /* WP pin = high level */
 void  nandflash_WP_high(void)
 {
@@ -339,25 +345,24 @@ void  nandflash_HOLD_high(void)
       boot_gpio_set_value(GPIO_SPI_HOLD_PIN, 1);
 
 }
+#endif
 
 void nandflash_reset(void)
 {
      unsigned char  txbuf[2],val;
      unsigned int  i; 
      
-    /* 	WP=1, HOLD=1 */
-    nandflash_WP_high(); 
-    nandflash_HOLD_high();
+    /* nandflash WP/HOLD pin, must high level*/
 	  
     txbuf[0] = SPI_NAND_RESET_CMD;
     rt_spi_send_then_recv(txbuf,1, txbuf,0);
 
     /* about 500us */
-    drv_delay(500000/CPU_NS);
-        
+    us_delay(500);
+    
     for (i = 0; i < CHECK_NUM; i++)
     {
-        drv_delay(10000/CPU_NS);
+        us_delay(10);
         spi_nand_get_feature(STAT_STATUS, &val);
         
         if (!(val & NAND_SPI_ER_STATUS_OIP))
@@ -373,7 +378,7 @@ int spi_nand_flash_init(void)
 	   unsigned char rxbuf[4];
 
 	   spi_init();
-	   drv_delay(100);
+	   us_delay(100);
 	   nandflash_reset();
 	   nandflash_readid(rxbuf);                   //读出NAND FLASH ID号
 	   gNandFlashType=(rxbuf[0]<<8)+rxbuf[1];

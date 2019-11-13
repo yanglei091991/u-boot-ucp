@@ -28,8 +28,10 @@ void copy_data_to_ram(unsigned char *src,
   memcpy(dest,src,(size_t)len);
 }
 
-void config_pll()
+unsigned int config_pll(void)
 {
+    unsigned int count=0;
+    
     // config pll clock_t
     PLL1_CONFIG0 = (2 << 12) + (2 << 15) + 80; // 400MHz
     PLL3_CONFIG0 = (3 << 12) + (1 << 15) + 75; // 500MHz
@@ -37,14 +39,25 @@ void config_pll()
     PLL1_CTRL |= 1;
     // PLL3 enable
     PLL3_CTRL |= 1;
+    
     // add delay(50us);
+    us_delay(50);
     // wait pll1 and pll3 locked
     while((PLL_SEL_CTRL & (BIT12 | BIT14)) != (BIT12 | BIT14))
     {
-      // delay(1s);
-      // if((PLL_SEL_CTRL & (BIT12 | BIT14)) != (BIT12 | BIT14))
-      //   return;
+      // add delay(1s);
+      us_delay(100);   /* 100us */
+      count++;
+      if((count>=10000)&&((PLL_SEL_CTRL & (BIT12 | BIT14)) != (BIT12 | BIT14)))
+      {
+       #ifdef  UART
+         Uart_Printf("PLL lock fail! \n\r");
+       #endif
+         exit(1);
+         //return false;
+      }
     }
+    
     // switch xtal to pll
     PLL_SEL_CTRL |= 0x400;
     PLL_SEL_CTRL |= 0x100;
@@ -52,6 +65,10 @@ void config_pll()
     PLL_SEL_CTRL = PLL_SEL_CTRL & (~BIT16);
     // enable sdio clk to 50M
     SDIOCLK_CTRL = 1 + (9 << 13) + BIT18; // 50MHz
+    #ifdef  UART
+      Uart_Printf("PLL lock ok! \n\r");
+    #endif 
+    return true;
 }
 
 //volatile char read_arr_index = 1;
@@ -76,7 +93,9 @@ int main()
   }
 
 // config pll clock
-//   config_pll();
+#ifdef  SOC_PRJ
+   config_pll();     
+#endif
 
 // init interface 
 #if  0

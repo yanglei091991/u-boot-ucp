@@ -35,7 +35,7 @@ typedef unsigned long  ulong;
 //typedef unsigned int   uint32_t;
 
 
-void udelay(unsigned long usec);
+//void udelay(unsigned long usec);
 ulong get_timer(ulong usec);
 
 #define true  1
@@ -87,10 +87,10 @@ struct dw_timer {
 };
 
 
- void timer_init(void);
+void timer_init(void);
 int sd_init(void);
 void  sd_fs_read(void); // sd driver file system read
-
+void us_delay(unsigned int usec);
 
 #endif //SD_COMMON_H_
 

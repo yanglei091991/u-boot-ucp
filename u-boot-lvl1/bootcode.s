@@ -105,7 +105,7 @@ bootcode:
                 cmp     r0, #1                  // cpu1 run
                 beq     cpu1_jump
                 // CRG reg init
-                ldr     r0,  =0x00000B05
+                ldr     r0,  =0x00003B05
                 ldr     r1,  =0x03670060
                 str     r0, [r1]
                 ldr     r0,  =0xFFFFFFFF

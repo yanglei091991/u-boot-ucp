@@ -46,20 +46,30 @@ unsigned char  read_uboot_mode(void)
     if(boot_cfg&BOOT_CTL_SYNC4)
     { /* uboot from SPI0 flash */
     
-      /* spi0复用, 测试代码注掉, 正式代码打开 */
-      //spi0_pin_init();      
+#ifdef  SOC_PRJ 
+      /* SOC use spio0, spi0 must be pinmux init;fpga test use fpga SPI2 */
+      spi0_pin_init();
+#endif      
+      
 #ifdef  UART   
       Uart_Printf("BOOT2 SPI nand! \n\r");
-#endif      
+#endif    
+
       /* init spi, read uboot from spi flash */
-      /* 正式代码用SPI0, 测试代码用SPI2 */
       spi_nand_flash_init();
       
       /* check boot success or not */
 	  if(copy_boot2_to_ram(src,dest,&boot_size) == false)
       {
+      #ifdef  UART   
+          Uart_Printf("BOOT1 copy boot2 from SPI flash Failed! \n\r");
+      #endif        
         return false;  
       }
+
+      #ifdef  UART   
+          Uart_Printf("BOOT1 copy boot2 from SPI flash ok! \n\r");
+      #endif 	  
     }
     else
     { /* uboot from SDIO */
