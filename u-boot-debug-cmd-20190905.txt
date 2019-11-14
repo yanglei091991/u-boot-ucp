@@ -31,3 +31,6 @@ c
 
 //arm ds-5 "How to load sections to LMA, not VMA, during debugging with elf file"
 set elf load-segments-at-p_paddr on
+
+// sd init
+sudo mkfs.ext4 -O ^metadata_csum /dev/sdc

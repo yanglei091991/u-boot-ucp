@@ -39,7 +39,7 @@ void loadfile(void *addr)
 	r = ext4_fopen2(&bootfile, "/u-boot.bin", O_RDONLY);
 	if (r != EOK) {
 #ifdef  UART
-        Uart_Printf("BOOT2 SD card! \n\r");
+        Uart_Printf("ext4 fopen2 error! \n\r");
 #endif
     }
 
@@ -47,7 +47,7 @@ void loadfile(void *addr)
 		r = ext4_fread(&bootfile, addr, BUFSZ, &size);
 		if (r != EOK) {
 #ifdef  UART
-            Uart_Printf("BOOT2 SD card! \n\r");
+            Uart_Printf("ext4 fread error! \n\r");
 #endif
         }
 		addr += size;
