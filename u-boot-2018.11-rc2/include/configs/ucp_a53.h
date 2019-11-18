@@ -136,13 +136,35 @@
 	MEM_LAYOUT_ENV_SETTINGS \
     "bootargs=console=ttyS0,115200n8 rdinit=/linuxrc\0"
 //    "bootm 0x30000000 - 0x38000000\0"
-
+/*
 #define UCPBOOTCOMMAND \
     "ext4load mmc 0 0x10000000 uImage; " \
     "ext4load mmc 0 0x18000000 ucp.dtb; " \
     "bootm 0x10000000 - 0x18000000"
-
 #define CONFIG_BOOTCOMMAND UCPBOOTCOMMAND
+*/
+//SYSCFG
+#define SYSCFG_BASE_ADDR       0x03690000
+#define A53_M3_REMAP           (*((volatile unsigned int *)(SYSCFG_BASE_ADDR + 0x00*4)))
+// spi-nandflash cmd 
+#define UCPBOOT_NANDFLASH_CMD \
+    "ext4load mmc 0 0x41000000 uImage; " \
+    "ext4load mmc 0 0x50000000 ucp.dtb; " \
+    "mtd list; " \
+    "ydevconfig / spi-nand0 0x80 0x180; " \
+    "ymount /; " \
+    "ywrm uImage 0x41000000 0x7ae398; " \
+    "ywrm ucp.dtb 0x50000000 0xc5d; " \
+    "yrdm uImage 0x10000000; " \
+    "yrdm ucp.dtb 0x18000000; " \
+    "bootm 0x10000000 - 0x18000000"
+// sd card ext4 file system
+#define UCPBOOT_SDCARD_EXT4CMD \
+    "ext4load mmc 0 0x10000000 uImage; " \
+    "ext4load mmc 0 0x18000000 ucp.dtb; " \
+    "bootm 0x10000000 - 0x18000000"
+
+#define CONFIG_BOOTCOMMAND UCPBOOT_NANDFLASH_CMD
 //#define CONFIG_NR_DRAM_BANKS		1
 
 //#define CONFIG_FS_EXT4

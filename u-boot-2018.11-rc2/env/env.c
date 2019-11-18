@@ -174,30 +174,66 @@ int env_get_char(int index)
 int env_load(void)
 {
 	struct env_driver *drv;
-	int prio;
+//	int prio;
 
-	for (prio = 0; (drv = env_driver_lookup(ENVOP_LOAD, prio)); prio++) {
-		int ret;
+//	for (prio = 0; (drv = env_driver_lookup(ENVOP_LOAD, prio)); prio++) {
+//		int ret;
+//
+//		if (!drv->load)
+//			continue;
+//
+//		if (!env_has_inited(drv->location))
+//			continue;
+//
+//		printf("Loading Environment from %s... ", drv->name);
+//		/*
+//		 * In error case, the error message must be printed during
+//		 * drv->load() in some underlying API, and it must be exactly
+//		 * one message.
+//		 */
+//		ret = drv->load();
+//		if (ret) {
+//			debug("Failed (%d)\n", ret);
+//		} else {
+//			printf("OK\n");
+//			return 0;
+//		}
+//	}
+    if((A53_M3_REMAP&0x00002000) != 0)
+    {
+        gd->env_load_prio = 1;      // spi nandflash
+    }
+    else
+    {
+        gd->env_load_prio = 0;      // sd card
+    }
+	drv = env_driver_lookup(ENVOP_SAVE, gd->env_load_prio);
 
-		if (!drv->load)
-			continue;
+	int ret;
 
-		if (!env_has_inited(drv->location))
-			continue;
+	if (!drv->load)
+    {
+		printf("Get devide driver read Failed (%x)\n", (unsigned int)drv->load);
+        return -ENODEV;
+    }
+	if (!env_has_inited(drv->location))
+    {
+		debug("Devide driver init Failed");
+        return -ENODEV;
+    }
 
-		printf("Loading Environment from %s... ", drv->name);
-		/*
-		 * In error case, the error message must be printed during
-		 * drv->load() in some underlying API, and it must be exactly
-		 * one message.
-		 */
-		ret = drv->load();
-		if (ret) {
-			debug("Failed (%d)\n", ret);
-		} else {
-			printf("OK\n");
-			return 0;
-		}
+	printf("Loading Environment from %s... ", drv->name);
+	/*
+	 * In error case, the error message must be printed during
+	 * drv->load() in some underlying API, and it must be exactly
+	 * one message.
+	 */
+	ret = drv->load();
+	if (ret) {
+		debug("Failed (%d)\n", ret);
+	} else {
+		printf("OK\n");
+		return 0;
 	}
 
 	/*
@@ -213,8 +249,15 @@ int env_load(void)
 int env_save(void)
 {
 	struct env_driver *drv;
-
-	drv = env_driver_lookup(ENVOP_SAVE, gd->env_load_prio);
+    if((A53_M3_REMAP&0x00002000) != 0)
+    {    
+        gd->env_load_prio = 1;      // spi-nandflash
+    }
+    else
+    {
+        gd->env_load_prio = 0;      // sd card
+    }
+        drv = env_driver_lookup(ENVOP_SAVE, gd->env_load_prio);
 	if (drv) {
 		int ret;
 

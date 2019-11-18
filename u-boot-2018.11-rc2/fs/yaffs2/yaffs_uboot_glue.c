@@ -35,6 +35,11 @@
 #include "malloc.h"
 #endif
 
+#include <common.h>
+#include <errno.h>
+#include <spi.h>
+#include <spi-mem.h>
+#include <linux/mtd/spinand.h>
 unsigned yaffs_trace_mask = 0x0; /* Disable logging */
 static int yaffs_errno;
 
@@ -157,7 +162,6 @@ static int yaffs_regions_overlap(int a, int b, int x, int y)
 		(x <= b && b <= y);
 }
 
-extern struct mtd_info *g_mtd_info;
 void cmd_yaffs_devconfig(char *_mp, int flash_dev,
 			int start_block, int end_block)
 {
@@ -167,8 +171,18 @@ void cmd_yaffs_devconfig(char *_mp, int flash_dev,
 	char *mp = NULL;
 	struct nand_chip *chip;
 
+	struct udevice *udev;
+	int ret;
+
+	ret = uclass_get_device_by_driver(UCLASS_MTD,
+					  DM_GET_DRIVER(spinand),
+					  &udev);
+	if (ret && ret != -ENODEV)
+		pr_err("Failed to initialize MXS NAND controller. (error %d)\n", ret);
+
+    mtd = dev_get_uclass_priv(udev);
+
 //	mtd = get_nand_dev_by_index(flash_dev);
-  mtd = g_mtd_info;
   if (!mtd)
     printf("warning: empty global mtd_info!!!!!!\n");
 

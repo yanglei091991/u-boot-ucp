@@ -12,6 +12,7 @@
 #include <netdev.h>
 #include <asm/arch-armv7/systimer.h>
 #include <asm/mach-types.h>
+#include <environment.h>
 #include "ucp_ddr_dccm.h"
 #include "ucp_ddr_iccm.h"
 
@@ -147,3 +148,16 @@ void  spi2_ssn_gpio_set_value(unsigned char high)
      gpio_swportb_dr = value;
 }
 
+enum env_location env_get_location(enum env_operation op, int prio)
+{
+	switch (prio) {
+	case 0:
+		return ENVL_EXT4;
+
+	case 1:
+		return ENVL_SPI_NAND_FLASH;
+
+	default:
+		return ENVL_UNKNOWN;
+	}
+}

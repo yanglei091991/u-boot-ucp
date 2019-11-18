@@ -119,7 +119,7 @@ int gd5fxgq4uexxg_ecc_get_status(struct spinand_device *spinand,
 	u8 status2;
 	struct spi_mem_op op = SPINAND_GET_FEATURE_OP(GD5FXGQ4UEXXG_REG_STATUS2,
 						      &status2);
-	int ret;
+//	int ret;
 
 	switch (status & STATUS_ECC_MASK) {
 	case STATUS_ECC_NO_BITFLIPS:
@@ -131,9 +131,9 @@ int gd5fxgq4uexxg_ecc_get_status(struct spinand_device *spinand,
 		 * bit error status
 		 */
         printf("warning in gagia.c !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
-		//ret = spi_mem_exec_op(spinand->spimem, &op);
-		if (ret)
-			return ret;
+//		ret = spi_mem_exec_op(spinand->spimem, &op);
+//		if (ret)
+//			return ret;
 
 		/*
 		 * 4 ... 7 bits are flipped (1..4 can't be detected, so
