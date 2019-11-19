@@ -4,6 +4,7 @@ config ENV_IS_NOWHERE
 	bool "Environment is not stored"
 	depends on !ENV_IS_IN_EEPROM
 	depends on !ENV_IS_IN_EXT4
+	depends on !ENV_IS_IN_YAFFS2
 	depends on !ENV_IS_IN_FAT
 	depends on !ENV_IS_IN_FLASH
 	depends on !ENV_IS_IN_MMC
@@ -70,6 +71,12 @@ config ENV_IS_IN_EXT4
 	help
 	  Define this if you want to use the EXT4 file system for the environment.
 
+config ENV_IS_IN_YAFFS2
+	bool "Environment is in a YAFFS2 filesystem"
+	depends on !CHAIN_OF_TRUST
+	select YAFFS_WRITE
+	help
+	  Define this if you want to use the YAFFS2 file system for the environment.
 config ENV_IS_IN_FLASH
 	bool "Environment in flash memory"
 	depends on !CHAIN_OF_TRUST

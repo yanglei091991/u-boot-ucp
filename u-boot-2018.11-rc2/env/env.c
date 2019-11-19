@@ -199,7 +199,7 @@ int env_load(void)
 //			return 0;
 //		}
 //	}
-    if((A53_M3_REMAP&0x00002000) != 0)
+    if((A53_M3_REMAP&0x00000010) != 0)
     {
         gd->env_load_prio = 1;      // spi nandflash
     }
@@ -249,7 +249,7 @@ int env_load(void)
 int env_save(void)
 {
 	struct env_driver *drv;
-    if((A53_M3_REMAP&0x00002000) != 0)
+    if((A53_M3_REMAP&0x00000010) != 0)
     {    
         gd->env_load_prio = 1;      // spi-nandflash
     }
@@ -257,7 +257,8 @@ int env_save(void)
     {
         gd->env_load_prio = 0;      // sd card
     }
-        drv = env_driver_lookup(ENVOP_SAVE, gd->env_load_prio);
+
+    drv = env_driver_lookup(ENVOP_SAVE, gd->env_load_prio);
 	if (drv) {
 		int ret;
 

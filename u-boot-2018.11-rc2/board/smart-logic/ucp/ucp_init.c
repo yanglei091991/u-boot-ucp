@@ -155,7 +155,7 @@ enum env_location env_get_location(enum env_operation op, int prio)
 		return ENVL_EXT4;
 
 	case 1:
-		return ENVL_SPI_NAND_FLASH;
+		return ENVL_YAFFS2;
 
 	default:
 		return ENVL_UNKNOWN;

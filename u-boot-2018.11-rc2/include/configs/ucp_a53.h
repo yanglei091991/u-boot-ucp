@@ -92,6 +92,8 @@
 
 /* Environment organization */
 //#define CONFIG_ENV_IS_IN_FLASH		0
+
+#define CONFIG_ENV_IS_IN_YAFFS2   1
 #define CONFIG_ENV_IS_IN_EXT4   1
 #define CONFIG_ENV_OFFSET		(6 * 1024 * 1024)
 #define CONFIG_ENV_SIZE			(16 * 1024)
@@ -150,7 +152,6 @@
 #define UCPBOOT_NANDFLASH_CMD \
     "ext4load mmc 0 0x41000000 uImage; " \
     "ext4load mmc 0 0x50000000 ucp.dtb; " \
-    "mtd list; " \
     "ydevconfig / spi-nand0 0x80 0x180; " \
     "ymount /; " \
     "ywrm uImage 0x41000000 0x7ae398; " \
@@ -164,7 +165,11 @@
     "ext4load mmc 0 0x18000000 ucp.dtb; " \
     "bootm 0x10000000 - 0x18000000"
 
-#define CONFIG_BOOTCOMMAND UCPBOOT_NANDFLASH_CMD
+#define UCPBOOT_NANDFLASH_CMD1 \
+    "ext4load mmc 0 0x41000000 uImage; " \
+    "ext4load mmc 0 0x50000000 ucp.dtb; "
+
+#define CONFIG_BOOTCOMMAND UCPBOOT_NANDFLASH_CMD1
 //#define CONFIG_NR_DRAM_BANKS		1
 
 //#define CONFIG_FS_EXT4
