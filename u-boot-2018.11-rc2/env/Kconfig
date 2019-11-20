@@ -438,6 +438,14 @@ config ENV_EXT4_FILE
 	  It's a string of the EXT4 file name. This file use to store the
 	  environment (explicit path to the file)
 
+config ENV_YAFFS2_FILE
+	string "Name of the YAFFS2 file to use for the environment"
+	depends on ENV_IS_IN_YAFFS2
+	default "uboot.env"
+	help
+	  It's a string of the YAFFS2 file name. This file use to store the
+	  environment (explicit path to the file)
+
 if ARCH_ROCKCHIP || ARCH_SUNXI || ARCH_ZYNQ || ARCH_ZYNQMP
 
 config ENV_OFFSET

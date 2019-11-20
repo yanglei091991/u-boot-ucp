@@ -148,6 +148,10 @@
 //SYSCFG
 #define SYSCFG_BASE_ADDR       0x03690000
 #define A53_M3_REMAP           (*((volatile unsigned int *)(SYSCFG_BASE_ADDR + 0x00*4)))
+#define YAFFS2_START_BLOCK      0x80
+#define YAFFS2_END_BLOCK        0x180
+#define CONFIG_ENV_YAFFS2_FILE  "/uboot2.env"
+
 // spi-nandflash cmd 
 #define UCPBOOT_NANDFLASH_CMD \
     "ext4load mmc 0 0x41000000 uImage; " \
@@ -155,7 +159,7 @@
     "ydevconfig / spi-nand0 0x80 0x180; " \
     "ymount /; " \
     "ywrm uImage 0x41000000 0x7ae398; " \
-    "ywrm ucp.dtb 0x50000000 0xc5d; " \
+    "ywrm ucp.dtb 0x50000000 0xcba; " \
     "yrdm uImage 0x10000000; " \
     "yrdm ucp.dtb 0x18000000; " \
     "bootm 0x10000000 - 0x18000000"
@@ -165,11 +169,7 @@
     "ext4load mmc 0 0x18000000 ucp.dtb; " \
     "bootm 0x10000000 - 0x18000000"
 
-#define UCPBOOT_NANDFLASH_CMD1 \
-    "ext4load mmc 0 0x41000000 uImage; " \
-    "ext4load mmc 0 0x50000000 ucp.dtb; "
-
-#define CONFIG_BOOTCOMMAND UCPBOOT_NANDFLASH_CMD1
+#define CONFIG_BOOTCOMMAND UCPBOOT_NANDFLASH_CMD
 //#define CONFIG_NR_DRAM_BANKS		1
 
 //#define CONFIG_FS_EXT4

@@ -209,19 +209,19 @@ static int env_yaffs_load(void)
 
 	int h;
 	struct yaffs_stat s;
-    char *fn = "/uboot.env"; 
+//    char *fn = "/uboot.env"; 
 //    char *addr;
 
-    env_yaffs_devconfig("/", 0x80, 0x180);
+    env_yaffs_devconfig("/", YAFFS2_START_BLOCK, YAFFS2_END_BLOCK);
     env_yaffs_mount("/");
 
-	yaffs_stat(fn, &s);
+	yaffs_stat(CONFIG_ENV_YAFFS2_FILE, &s);
 
 //	printf("Copy %s to 0x%p... ", fn, addr);
-	h = yaffs_open(fn, O_RDWR, 0);
+	h = yaffs_open(CONFIG_ENV_YAFFS2_FILE, O_RDWR, 0);
 	if (h < 0) {
 		printf("File not found\n");
-		return -EIO;
+		goto err_env_relocate;
 	}
 
 	err = yaffs_read(h, buf, CONFIG_ENV_SIZE);
@@ -231,14 +231,16 @@ static int env_yaffs_load(void)
     yaffs_unmount("/");
 
 	if (err == -1) {
-		printf("\n** Unable to read \"%s\" from yaffs2 **\n", fn);
+		printf("\n** Unable to read \"%s\" from yaffs2 **\n", CONFIG_ENV_YAFFS2_FILE);
 		goto err_env_relocate;
 	}
 
 	return env_import(buf, 1);
 
 err_env_relocate:
-	set_default_env(NULL, 0);
+	yaffs_close(h);
+    yaffs_unmount("/");
+    set_default_env(NULL, 0);
 
 	return -EIO;
 }
@@ -247,7 +249,7 @@ static int env_yaffs_save(void)
 {
 	env_t	env_new;
 	int outh;
-    char *fn = "/uboot.env"; 
+//    char *fn = "/uboot.env"; 
 //    char *addr; 
 //    int size;
     int err;
@@ -256,20 +258,19 @@ static int env_yaffs_save(void)
 	if (err)
 		return err;
    
-    env_yaffs_devconfig("/", 0x80, 0x180);
+    env_yaffs_devconfig("/", YAFFS2_START_BLOCK, YAFFS2_END_BLOCK);
     env_yaffs_mount("/");
 	
-    outh = yaffs_open(fn, O_CREAT | O_RDWR | O_TRUNC, S_IREAD | S_IWRITE);
+    outh = yaffs_open(CONFIG_ENV_YAFFS2_FILE, O_CREAT | O_RDWR | O_TRUNC, S_IREAD | S_IWRITE);
 	if (outh < 0)
 		printf("Error opening file: %d, %s\n", outh, yaffs_error_str());
 
 	err = yaffs_write(outh, (void *)&env_new, sizeof(env_t));
-
 	yaffs_close(outh);
     yaffs_unmount("/");
 	
     if (err == -1) {
-		printf("\n** Unable to write \"%s\" from yaffs2 **\n", fn);
+		printf("\n** Unable to write \"%s\" from yaffs2 **\n", CONFIG_ENV_YAFFS2_FILE);
 		return 1;
 	}
 
