@@ -91,6 +91,6 @@ void timer_init(void);
 int sd_init(void);
 void  sd_fs_read(void); // sd driver file system read
 void us_delay(unsigned int usec);
-
+void tus_delay(unsigned int tusec);
 #endif //SD_COMMON_H_
 

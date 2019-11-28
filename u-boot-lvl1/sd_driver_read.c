@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <string.h>
+#include "drv_common.h"
 #include "sd_common.h"
 #include "mmc.h"
 #include "dwmmc.h"
+
 
 #define  UCP_SDIO_BASE       0x02050000
 #define  SDIO_BUS_WIDTH      4
@@ -10,16 +12,19 @@
 //#define	 DWMMC_MAX_FREQ			5000000   /* 5M */
 #define	 DWMMC_MAX_FREQ			10000000   /* 10M */
 #define	 DWMMC_MIN_FREQ			  400000   /* 400k */
-#define	 DWMMC_CLOCK			50000000   /* 50M */
+#define	 DWMMC_CLOCK			SYS_CLK   /* 50M */
 
 struct mmc ucp_mmc;
 struct dwmci_host ucp_host;
 
 #define SYSTIMER_RELOAD 0xFFFFFFFF
 static struct dw_timer *systimer_base = (struct dw_timer *)0x031d0000;
+static struct dw_timer *systimer1_base = (struct dw_timer *)0x031d0014;
 
-#define TIMER_CLK   50000000            /* 50M */
+#define TIMER_CLK   SYS_CLK            /* 50M */
 #define BASE_US    (TIMER_CLK/1000000)  /* BASE_US=1us */
+
+#define BASE_10US   25     /* timer clk=2.5M, base=10us */
 
 int mmc_init(struct mmc *mmc);
 u32 mmc_bread(u32 start, u32 blkcnt,void *dst);
@@ -106,16 +111,34 @@ void us_delay(unsigned int usec)
 {
     unsigned int value,status;
 
-    writel(0, &systimer_base->timer0control);
+    writel(0, &systimer1_base->timer0control);
     value = usec*BASE_US;
-    writel(value, &systimer_base->timer0load);
-	writel(3, &systimer_base->timer0control);
+    writel(value, &systimer1_base->timer0load);
+	writel(3, &systimer1_base->timer0control);
 
     do{    
-       status = readl(&systimer_base->timer0IntStatus);
+       status = readl(&systimer1_base->timer0IntStatus);
     }while(!status);	
-	writel(0, &systimer_base->timer0control);	
+	writel(0, &systimer1_base->timer0control);	
 }
+
+/* before pll locked, clock is 2.5MHz  
+  delay unit: 10us */
+void tus_delay(unsigned int tusec)
+{
+    unsigned int value,status;
+
+    writel(0, &systimer1_base->timer0control);
+    value = tusec*BASE_10US;
+    writel(value, &systimer1_base->timer0load);
+	writel(3, &systimer1_base->timer0control);
+
+    do{    
+       status = readl(&systimer1_base->timer0IntStatus);
+    }while(!status);	
+	writel(0, &systimer1_base->timer0control);	
+}
+
 
 
 /* 返回值单位us  */

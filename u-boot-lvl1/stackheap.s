@@ -22,22 +22,22 @@
 //-----------------------------------------------------------------------------
 
                 // Align stackheap section on a 4k boundary
-                .section .stackheap, "aw", %progbits
-                .align 12
+//                .section .stackheap, "aw", %progbits
+//                .align 12
 
 // Load stack definitions
-.include "boot_defs.hs"
+//.include "boot_defs.hs"
 
 //-------------------------------------------------------------------------------
 // Stack and heap area
 //-------------------------------------------------------------------------------
 
-                .global  stack_top
-                .global  heap_base
+//                .global  stack_top
+//                .global  heap_base
 //
 //heap_base:      .space   1
 //                .space   (HEAP_SIZE-1)
 //                .space   (STACK_SIZE-4)
 //stack_top:      .space   4
 
-                .end
+//                .end

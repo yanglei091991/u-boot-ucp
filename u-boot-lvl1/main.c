@@ -8,10 +8,9 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#define _READ_INTERFACE
 #include "uart.h"
 #include "gpio.h"
-#include "common.h"
+//#include "common.h"
 //#include "crc16_test.h"
 #include "ddr_test.h"
 #include "config_pll.h"
@@ -41,20 +40,17 @@ unsigned int config_pll(void)
     PLL3_CTRL |= 1;
     
     // add delay(50us);
-    us_delay(50);
+    tus_delay(5);
     // wait pll1 and pll3 locked
     while((PLL_SEL_CTRL & (BIT12 | BIT14)) != (BIT12 | BIT14))
     {
       // add delay(1s);
-      us_delay(100);   /* 100us */
+      tus_delay(10);   /* 100us */
       count++;
       if((count>=10000)&&((PLL_SEL_CTRL & (BIT12 | BIT14)) != (BIT12 | BIT14)))
       {
-       #ifdef  UART
-         Uart_Printf("PLL lock fail! \n\r");
-       #endif
-         exit(1);
-         //return false;
+         //exit(1);
+         return false;
       }
     }
     
@@ -65,9 +61,7 @@ unsigned int config_pll(void)
     PLL_SEL_CTRL = PLL_SEL_CTRL & (~BIT16);
     // enable sdio clk to 50M
     SDIOCLK_CTRL = 1 + (9 << 13) + BIT18; // 50MHz
-    #ifdef  UART
-      Uart_Printf("PLL lock ok! \n\r");
-    #endif 
+
     return true;
 }
 
@@ -76,11 +70,6 @@ unsigned int config_pll(void)
 
 int main()
 {
-//    int val = ddr_test();
-//    if(val != 0)
-//        return 1;
-//       printf("ddr write and read err");
-
   // copy data segment from rom to share mem 5
   extern unsigned char data_load_start[];
   extern unsigned char __data_start[];
@@ -94,7 +83,7 @@ int main()
 
 // config pll clock
 #ifdef  SOC_PRJ
-   config_pll();     
+   config_pll();
 #endif
 
 // init interface 
@@ -106,21 +95,13 @@ int main()
   drv_led0_off();  
 
 #endif
+
   boot_uart_init();
 #ifdef  UART
   Uart_Printf("UART init success! \n\r");
-#endif
+#endif  
+
   read_uboot_mode();
-//  add read_id() select read_interface of the manufacturers
-//  volatile int read_arr_index = 0;
-
-//  unsigned int *src = (unsigned int*)nandflash_startAddr;
-//  unsigned char *dest = (unsigned char*)copy_addr;
-//  unsigned int boot_size = 0;
-
-//  if(copy_boot2_to_ram(src,dest,&boot_size) == false)
-//  {
-//    return 1;  
-//  }
+ 
   return 0;
 }

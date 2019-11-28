@@ -1,5 +1,8 @@
 #include "common.h"
 
+int read_arr_index = 0;
+unsigned char (* nandflash_read_arr[])(unsigned int,unsigned int,unsigned char*,unsigned int) = {nandflash_read};
+
 bool copy_boot2_to_ram(unsigned int *src, unsigned char *dest, unsigned int *boot_size)
 {
   unsigned int rowAddr = ((unsigned int)src&0x1FFFF800)>>11;
@@ -8,7 +11,12 @@ bool copy_boot2_to_ram(unsigned int *src, unsigned char *dest, unsigned int *boo
   unsigned char SM5_Addr[32] = {0}; 
 //  unsigned int len = 0x800; // 2k
   if(nandflash_read_arr[read_arr_index](rowAddr, colAddr, SM5_Addr, sizeof(SM5_Addr)) != 0)
+  {
+#ifdef UART
       Uart_Printf("spi read head nand error! \n\r");
+#endif 
+      return false;
+  }
 
   NandFlash_Head nand_head;
   volatile unsigned short int *pNandHead = (volatile unsigned short int*)SM5_Addr;
@@ -34,7 +42,12 @@ bool copy_boot2_to_ram(unsigned int *src, unsigned char *dest, unsigned int *boo
     rowAddr = (unsigned int)srcAddr << 6;
     colAddr = 0x0;
     if(nandflash_read_arr[read_arr_index](rowAddr, colAddr, tmp_dest, Block_Size) != 0)
-      Uart_Printf("spi read block nand error! \n\r");
+    {
+#ifdef UART
+        Uart_Printf("spi read block nand error! \n\r");
+#endif
+        return false;
+    }
     tmp_dest = tmp_dest + Block_Size;
   }
 
@@ -44,7 +57,12 @@ bool copy_boot2_to_ram(unsigned int *src, unsigned char *dest, unsigned int *boo
     rowAddr = (unsigned int)srcAddr << 6;
     colAddr = 0x0;
     if(nandflash_read_arr[read_arr_index](rowAddr, colAddr, tmp_dest, nand_head.byte_size%Block_Size) != 0)
-      Uart_Printf("spi read remainder block nand error! \n\r");
+    {
+#ifdef UART    
+        Uart_Printf("spi read remainder block nand error! \n\r");
+#endif
+        return false;
+    }
   }
 
   unsigned int dest_file_crc = crc32(dest, nand_head.byte_size);
@@ -53,29 +71,3 @@ bool copy_boot2_to_ram(unsigned int *src, unsigned char *dest, unsigned int *boo
   
   return true;
 }
-/*
-void clear_bss(void)
-{
-	extern int __bss_start__, __bss_end__;
-	int *p = &__bss_start__;
-	
-	for (; p < &__bss_end__; p++)
-		*p = 0;
-}
-*/
-/*void init_ram(unsigned char *start, unsigned char *end)*/
-/*{*/
-	/*unsigned char *p = start;*/
-	
-	/*for (; p < end; p++)*/
-		/**p = 0;*/
-/*}*/
-
-/*void copy_data_to_ram(unsigned char *src, unsigned char *dest, unsigned int len)*/
-/*{*/
-  /*int i = 0;*/
-  /*for (; i < len; i++)*/
-  /*{*/
-    /**dest = *src;*/
-  /*}*/
-/*}*/

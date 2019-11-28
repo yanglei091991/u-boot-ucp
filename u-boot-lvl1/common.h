@@ -25,7 +25,6 @@ image_dts
 #define copy_addr 0x04e60000
 enum{
 boot2 = 0,
-ddr,
 OS_Image,
 device_tree
 };
@@ -40,12 +39,8 @@ unsigned int head_end;
 
 bool copy_boot2_to_ram(unsigned int *src, unsigned char *dest, unsigned int *boot_ize);
 
-#ifdef _READ_INTERFACE
-volatile char read_arr_index = 1;
-unsigned char (* nandflash_read_arr[])(unsigned int,unsigned int,unsigned char*,unsigned int) = {nandflash_read, nandflash_read};
-#else
-extern volatile char read_arr_index;
+// define function point arr support mang manufacturer spi nand flash driver
+extern int read_arr_index;
 extern unsigned char (* nandflash_read_arr[])(unsigned int,unsigned int,unsigned char*,unsigned int);
-#endif
 
 #endif // _COMMMON_H

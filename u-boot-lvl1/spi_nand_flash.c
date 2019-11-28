@@ -109,11 +109,7 @@ void spi_init(void)
 	CTRLR0 = 0xC7;    
 	
 	/* Fssi_clk=50MHZ, Fclk_out = Fssi_clk/16 */
-#ifdef SOC_PRJ
-	BAUDR = 20;          /*  50MHZ/200=2.5M */
-#else	
-	BAUDR = 200;         /*  50MHZ/200=250k */
-#endif
+	BAUDR = SPI_BAUDR;          /*  50MHZ/200=2.5M, 50MHZ/200=250k */
 
 	//TXFTLR = 0;
 	//RXFTLR = 0;

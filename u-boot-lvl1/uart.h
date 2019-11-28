@@ -1,24 +1,14 @@
 #ifndef UART_H
 #define UART_H
-#if 0
-#define UART_BASE_0      0x42000000      /* UART 0 */
 
-
-#else
+#include "drv_common.h"
 
 #define UART_BASE_0      0x02108000      /* UART 0 */
 #define UART_BASE_1      0x02110000      /* UART 1 */
-#endif
-
-
-
-
-
-
 
 
 //#define UART0_CLK              25000000   /* 25MHz */
-#define UART0_CLK                50000000   /* 50MHz */
+#define UART0_CLK                SYS_CLK   /* 50MHz */
 #define UART0_BAUDRATE    115200
 
 

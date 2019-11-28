@@ -1,7 +1,7 @@
 #ifndef __SPI_H__
 #define __SPI_H__
 
-//#include "ALL_INC.h"
+#include "drv_common.h"
 
 /* SPI接口连接的从机设备个数 */
 //#define SSI_NUM_SLAVES 1
@@ -84,12 +84,15 @@ SPI3	  0x04a10000
 #define  COL_SIZE          64
 #define  PAGE_NUM          64
 
+
+#ifdef SOC_PRJ
+    #define  SPI_CLK     2500000     /* soc clock = 2.5M */	
+#else	
+	#define  SPI_CLK     250000      /* FPGA clock= 250k */
+#endif
+#define  SPI_BAUDR  (SYS_CLK/SPI_CLK)  
+
 /***********************   SPI 函数声明     ***********************/
-void SPI1_Init(void);
-//void SPI_Send(unsigned char dat);
-//void SPI_Send(unsigned short dat);
-//void SPI_write(_uint16_ reg_addr,_uint16_ reg_data);
-//unsigned int SPI_Receive(void);
-void SPI1_SetSpeed(unsigned char SpeedSet);
-unsigned char SPI1_ReadWriteByte(unsigned char);
+
+
 #endif /*SPI_H_*/
