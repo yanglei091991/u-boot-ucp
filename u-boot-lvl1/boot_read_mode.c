@@ -1,6 +1,6 @@
 #include "boot_read_mode.h"
 #include "sd_common.h"
-#include "common.h"
+#include "spi_nandflash_common.h"
 #include "pinmux.h"
 
 #ifdef  UART
@@ -61,15 +61,15 @@ unsigned char  read_uboot_mode(void)
       /* check boot success or not */
 	  if(copy_boot2_to_ram(src,dest,&boot_size) == false)
       {
-      #ifdef  UART   
+#ifdef  UART   
           Uart_Printf("BOOT1 copy boot2 from SPI flash Failed! \n\r");
-      #endif        
+#endif        
         return false;  
       }
 
-      #ifdef  UART   
+#ifdef  UART   
           Uart_Printf("BOOT1 copy boot2 from SPI flash ok! \n\r");
-      #endif 	  
+#endif 	  
     }
     else
     { /* uboot from SDIO */
@@ -77,19 +77,21 @@ unsigned char  read_uboot_mode(void)
         Uart_Printf("BOOT2 SD card! \n\r");
 #endif
         /* init sdio, read uboot from sd card */     
-       sd_fs_read();
+       if(sd_fs_read() == false)
+       {
+       
+#ifdef  UART   
+          Uart_Printf("BOOT1 copy boot2 from SD Failed! \n\r");
+#endif        
+        return false;  
+       }
 
-      /* check boot success or not */
+#ifdef  UART   
+          Uart_Printf("BOOT1 copy boot2 from SD ok! \n\r");
+#endif 	  
       
     }
     return true;   
 }
-
-
-
-
-
-
-
 
 

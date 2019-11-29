@@ -56,7 +56,7 @@ ulong get_timer(ulong usec);
 #define __ALIGN_MASK(x,mask)	(((x)+(mask))&~(mask))
 #define ALIGN(x,a)		__ALIGN_MASK((x),(typeof(x))(a)-1)
 
-/* Reused from common.h */
+/* Reused from spi_nandflash_common.h */
 #define ROUND(a, b)		(((a) + (b) - 1) & ~((b) - 1))
 
 #define PAD_COUNT(s, pad) (((s) - 1) / (pad) + 1)
@@ -89,7 +89,7 @@ struct dw_timer {
 
 void timer_init(void);
 int sd_init(void);
-void  sd_fs_read(void); // sd driver file system read
+int  sd_fs_read(void); // sd driver file system read
 void us_delay(unsigned int usec);
 void tus_delay(unsigned int tusec);
 #endif //SD_COMMON_H_

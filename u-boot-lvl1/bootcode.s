@@ -110,23 +110,9 @@ bootcode:
                 // cpu1 wakeup end
                 b     cpu_start
 
-                // If the CPU is not CPU0 then enter WFI
-//wfi_loop:       wfi
-//                b       wfi_loop
-
-
-//-------------------------------------------------------------------------------
-// Start the test
-//-------------------------------------------------------------------------------
-                // If IK_MODE is set, all CPUs can reach this cpu_start label. 
-                // If IK_MODE is not set (which is default for execution TB), only 
-                // CPU0 reaches this label (the others are in WFI).  The label
-                // for the start of the test depends on whether it's a C or an
-                // assember test.  Weakly import the labels for each and to
-                // determine the correct one.  Note that the linker translates
-                // any branches to non-existant weakly-imported labels to NOPs.
 
 /**********************************************/
+// cpu1 wfe
 wfe_lable:
                 wfe
                 wfe

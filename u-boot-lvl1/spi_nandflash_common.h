@@ -1,5 +1,5 @@
-#ifndef _COMMON_H
-#define _COMMON_H
+#ifndef SPI_NANDFLASH_COMMON_H
+#define SPI_NANDFLASH_COMMON_H
 
 #include <stdio.h>
 #include <stdint.h>
@@ -9,7 +9,7 @@
 #include <unistd.h>
 #include <stdbool.h>
 #include "spi_nand_flash.h"
-#include "crc16_test.h"
+#include "crc32.h"
 #include "uart.h"
 
 #define page 2048
@@ -43,4 +43,4 @@ bool copy_boot2_to_ram(unsigned int *src, unsigned char *dest, unsigned int *boo
 extern int read_arr_index;
 extern unsigned char (* nandflash_read_arr[])(unsigned int,unsigned int,unsigned char*,unsigned int);
 
-#endif // _COMMMON_H
+#endif // SPI_NANDFLASH_COMMON_H

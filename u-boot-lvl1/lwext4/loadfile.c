@@ -15,7 +15,7 @@
 //		;
 //}
 
-void loadfile(void *addr)
+int loadfile(void *addr)
 {
 	size_t size = BUFSZ;
 	ext4_file bootfile;
@@ -27,7 +27,7 @@ void loadfile(void *addr)
 #ifdef  UART
        Uart_Printf("BOOT1 ext4 device register error! \n\r");
 #endif
-       return ;
+       return false;
 	}
 
 	r = ext4_mount("mmc", "/", true /* read only */);
@@ -35,7 +35,7 @@ void loadfile(void *addr)
 #ifdef  UART
        Uart_Printf("BOOT1 ext4 mount error! \n\r");
 #endif
-       return ;
+       return false;
     }
 
 	r = ext4_fopen2(&bootfile, "/u-boot.bin", O_RDONLY);
@@ -43,7 +43,7 @@ void loadfile(void *addr)
 #ifdef  UART
         Uart_Printf("ext4 fopen2 error! \n\r");
 #endif
-        return ;
+        return false;
     }
 
 	while (size) {
@@ -52,11 +52,13 @@ void loadfile(void *addr)
 #ifdef  UART
             Uart_Printf("ext4 fread error! \n\r");
 #endif
-            return ;
+            return false;
         }
 		addr += size;
 	}
 
 	ext4_fclose(&bootfile);
 	ext4_umount("/");
+
+    return true;
 }

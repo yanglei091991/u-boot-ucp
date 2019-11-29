@@ -30,9 +30,9 @@
 //   shareable memory.
 //-------------------------------------------------------------------------------
 
-                .section pagetables, "ax", %progbits
-                .align 14       // Align on 16k boundary
+//                .section pagetables, "ax", %progbits
+//                .align 14       // Align on 16k boundary
 
 
-                .end
+//                .end
 

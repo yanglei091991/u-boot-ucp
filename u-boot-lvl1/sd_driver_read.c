@@ -269,13 +269,15 @@ void print_mmcinfo(struct mmc *mmc)
 
 #endif
 
-void  sd_fs_read(void) // sd driver file system read
+int  sd_fs_read(void) // sd driver file system read
 {
    timer_init();
    //test_timer();
    sd_init();
    //print_mmcinfo(&ucp_mmc);
 
-   void loadfile(void *addr);
-   loadfile((void*)0x04e60000);
+   int loadfile(void *addr);
+   if(loadfile((void*)0x04e60000) == false) return false;
+
+   return true;
 }

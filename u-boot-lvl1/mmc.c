@@ -7,7 +7,7 @@
  */
 #if  0
 #include <config.h>
-#include <common.h>
+#include <spi_nandflash_common.h>
 #include <command.h>
 #include <dm.h>
 #include <dm/device-internal.h>

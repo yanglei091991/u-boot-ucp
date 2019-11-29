@@ -7,7 +7,7 @@
 
 #if  0
 #include <bouncebuf.h>
-#include <common.h>
+#include <spi_nandflash_common.h>
 #include <errno.h>
 #include <malloc.h>
 #include <memalign.h>

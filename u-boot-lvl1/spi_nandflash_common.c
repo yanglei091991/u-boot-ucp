@@ -1,4 +1,4 @@
-#include "common.h"
+#include "spi_nandflash_common.h"
 
 int read_arr_index = 0;
 unsigned char (* nandflash_read_arr[])(unsigned int,unsigned int,unsigned char*,unsigned int) = {nandflash_read};

@@ -10,8 +10,6 @@
 
 #include "uart.h"
 #include "gpio.h"
-//#include "common.h"
-//#include "crc16_test.h"
 #include "ddr_test.h"
 #include "config_pll.h"
 #include "sd_common.h"
@@ -64,9 +62,6 @@ unsigned int config_pll(void)
 
     return true;
 }
-
-//volatile char read_arr_index = 1;
-//unsigned char (* nandflash_read_arr[])(unsigned int,unsigned int,unsigned char*,unsigned int) = {nandflash_read, nandflash_read};
 
 int main()
 {
