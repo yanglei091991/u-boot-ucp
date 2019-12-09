@@ -38,20 +38,6 @@ extern char __bss_start__[], __bss_end__[];
 extern void __libc_init_array(void);
 extern void __libc_fini_array(void);
 
-void initialise_monitor_handles(void) { }
-
-int _close(int fh) { }
-int _gettimeofday(struct timeval* tv,void* tz) { }
-int _isatty(int fh) { }
-int _lseek(int fh, off_t offset, int whence) { }
-int _open(const char *path, int oflag, /* int mode */...) { return 1; }
-int _read(int fh, unsigned char *buffer, int count) { }
-int _rename(const char *old, const char *new ) { }
-clock_t _times(struct tms *buf) { }
-int _unlink(const char *name) { }
-int _kill(int pid, int sig) { }
-int _fstat(int fildes, struct stat *buf) { }
-
 unsigned char output_char(unsigned char c)
 {
     //volatile int *tube = (volatile int *) 0xfc000000;

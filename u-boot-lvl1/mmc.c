@@ -39,6 +39,12 @@ static int mmc_power_cycle(struct mmc *mmc);
 static int mmc_select_mode_and_width(struct mmc *mmc, uint card_caps);
 #endif
 
+void Uart_Printf(unsigned char *string);
+unsigned int sd_detect(void);
+
+
+
+
 #if 1//!CONFIG_IS_ENABLED(DM_MMC)
 
 #ifdef MMC_UHS_SUPPORT//CONFIG_IS_ENABLED(MMC_UHS_SUPPORT)
@@ -73,7 +79,7 @@ int mmc_getwp(struct mmc *mmc)
 
 int board_mmc_getcd(struct mmc *mmc)
 {
-	return -1;
+	return 1;
 }
 #endif
 #endif
@@ -1068,7 +1074,7 @@ int mmc_getcd(struct mmc *mmc)
 	int cd;
 
 	cd = board_mmc_getcd(mmc);
-
+#if  0
 	if (cd < 0) 
 	{
 		if (mmc->cfg->ops->getcd)
@@ -1076,7 +1082,7 @@ int mmc_getcd(struct mmc *mmc)
 		else
 			cd = 1;
 	}
-
+#endif
 	return cd;
 }
 #endif
@@ -2275,6 +2281,8 @@ static int mmc_startup(struct mmc *mmc)
 		return err;
 #endif
 
+   mmc->capacity = mmc->capacity_user;
+
 //#if CONFIG_IS_ENABLED(MMC_TINY)
 #ifdef 	MMC_TINY
 	mmc_set_clock(mmc, mmc->legacy_speed, false);
@@ -2380,20 +2388,11 @@ static int mmc_send_if_cond(struct mmc *mmc)
 static void mmc_set_initial_state(struct mmc *mmc)
 {
 	int err;
- 
-    /* SD卡1.8V电源是否要支持 */ 
-	/* First try to set 3.3V. If it fails set to 1.8V */
-	err = mmc_set_signal_voltage(mmc, MMC_SIGNAL_VOLTAGE_330);
-	if (err != 0)
-		err = mmc_set_signal_voltage(mmc, MMC_SIGNAL_VOLTAGE_180);
-	if (err != 0)
-		//pr_warn("mmc: failed to set signal voltage\n");
-		debug("mmc: failed to set signal voltage\n");
 		
 	/* mode = MMC_LEGACY,	tran_speed= 25M  
 	   mode = SD_LEGACY ,	tran_speed= 25M    */
 	//mmc_select_mode(mmc, MMC_LEGACY);
-	mmc_select_mode(mmc, SD_LEGACY);      /* 是否可以 */
+	mmc_select_mode(mmc, SD_LEGACY);
 	mmc_set_bus_width(mmc, 1); 
 	mmc_set_clock(mmc, 0, MMC_CLK_ENABLE);
 }
@@ -2446,6 +2445,7 @@ static int mmc_power_cycle(struct mmc *mmc)
 	 */
 	us_delay(2000);
 	//return mmc_power_on(mmc);
+	return 0;
 }
 
 int mmc_get_op_cond(struct mmc *mmc)
@@ -2456,7 +2456,14 @@ int mmc_get_op_cond(struct mmc *mmc)
 	if (mmc->has_init)
 		return 0;
 
+#ifdef CONFIG_MMC_QUIRKS
+	mmc->quirks = MMC_QUIRK_RETRY_SET_BLOCKLEN |
+		      MMC_QUIRK_RETRY_SEND_CID;
+#endif
+
+#if  0
 	err = mmc_power_cycle(mmc);
+
 	if (err) {
 		/*
 		 * if power cycling is not supported, we should not try
@@ -2468,10 +2475,13 @@ int mmc_get_op_cond(struct mmc *mmc)
 		
 		uhs_en = false;
 		mmc->host_caps &= ~UHS_CAPS;
-		err = mmc_power_on(mmc);
+		//err = mmc_power_on(mmc);
+		err = 0;
 	}
 	if (err)
 		return err;
+#endif
+
 
 //#if CONFIG_IS_ENABLED(DM_MMC)
 #if 0
@@ -2487,6 +2497,7 @@ int mmc_get_op_cond(struct mmc *mmc)
 
 retry:
 	mmc_set_initial_state(mmc);
+    us_delay(1000);             /* 1ms ,74cycle */
 	//mmc_send_init_stream(mmc);
 
 	/* Reset the Card */
@@ -2531,7 +2542,7 @@ retry:
 
 int mmc_start_init(struct mmc *mmc)
 {
-	bool no_card;
+	unsigned int no_card;
 	int err = 0;
 
 	/*
@@ -2540,6 +2551,17 @@ int mmc_start_init(struct mmc *mmc)
 	 */
 	mmc->host_caps = mmc->cfg->host_caps | MMC_CAP(SD_LEGACY) |
 			 MMC_CAP(MMC_LEGACY) | MMC_MODE_1BIT;
+
+#ifdef  MMC_CARD_DETECT
+
+   no_card = sd_detect() == 1;
+   if (no_card)
+  {
+     Uart_Printf("SD card: no card present!\r\n");
+	//return -ENOMEDIUM;
+  }
+ 	
+#endif
 
 	err = mmc_get_op_cond(mmc);
 
@@ -2569,15 +2591,15 @@ static int mmc_complete_init(struct mmc *mmc)
 int mmc_init(struct mmc *mmc)
 {
 	int err = 0;
-	ulong start;
+	//ulong start;
 
 	//start = get_timer(0);
 	err = mmc_start_init(mmc);
 
 	if (!err)
 		err = mmc_complete_init(mmc);
-	if (err)
-		debug("%s: %d, time %lu\n", __func__, err, get_timer(start));
+	//if (err)
+	//	debug("%s: %d, time %lu\r\n", __func__, err, get_timer(start));
 
 	return err;
 }

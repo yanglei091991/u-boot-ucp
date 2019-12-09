@@ -7,9 +7,10 @@
 #define UART_BASE_1      0x02110000      /* UART 1 */
 
 
-//#define UART0_CLK              25000000   /* 25MHz */
-#define UART0_CLK                SYS_CLK   /* 50MHz */
+#define UART0_CLK            SYS_CLK
 #define UART0_BAUDRATE    115200
+//#define UART0_BAUDRATE    19200
+
 
 
 #define UART_LCRVAL  UART_LCR_8N1		    /* 8 data, 1 stop, no parity */

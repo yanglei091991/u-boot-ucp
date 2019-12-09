@@ -9,12 +9,6 @@
 
 #define BUFSZ 4096
 
-//static void die(void)
-//{
-//	while (1)
-//		;
-//}
-
 int loadfile(void *addr)
 {
 	size_t size = BUFSZ;

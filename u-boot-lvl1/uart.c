@@ -3,15 +3,9 @@
 
 #include "uart.h"
 
-#pragma GCC push_options
-#pragma GCC optimize ("O0")
+//#pragma GCC push_options
+//#pragma GCC optimize ("O0")
 
-#define    DRV_OK                     0x0
-#define    WAIT_TIMEOUT        0x1
-#define    ECC_ERROR               0x2
-#define    PARA_ERROR            0x3
-#define    ERASE_ERROR          0x4
-#define    PROM_ERROR           0x5
 
 //volatile unsigned int *uart0_addr=(volatile unsigned int *) UART_BASE_0;
 struct mapu_uart *uart0_addr =(struct mapu_uart *)UART_BASE_0;
@@ -90,7 +84,7 @@ void  print_hex(unsigned char hex)
 }
 
 
-#pragma GCC pop_options
+//#pragma GCC pop_options
 
 
 

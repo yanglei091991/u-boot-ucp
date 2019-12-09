@@ -6,7 +6,7 @@
 #include "dwmmc.h"
 
 
-#define  UCP_SDIO_BASE       0x02050000
+//#define  UCP_SDIO_BASE       0x02050000
 #define  SDIO_BUS_WIDTH      4
 
 //#define	 DWMMC_MAX_FREQ			5000000   /* 5M */
@@ -44,7 +44,9 @@ struct mmc *mmc_create(const struct mmc_config *cfg, void *priv)
 	return mmc;
 }
 
-
+/* blocksize=512byte, 
+   start: start block
+*/
 //ulong mmc_bread(struct blk_desc *block_dev, u32 start, u32 blkcnt,void *dst)
 u32 mmc_bread(u32 start, u32 blkcnt,void *dst)
 {	
@@ -55,29 +57,6 @@ u32 mmc_bread(u32 start, u32 blkcnt,void *dst)
 	if (blkcnt == 0)
 		return 0;
 		
-#ifndef  SELF_TEST
-	struct mmc *mmc = find_mmc_device(dev_num);
-	if (!mmc)
-		return 0;
-
-	if (CONFIG_IS_ENABLED(MMC_TINY))
-		err = mmc_switch_part(mmc, block_dev->hwpart);
-	else
-		err = blk_dselect_hwpart(block_dev, block_dev->hwpart);
-
-	if (err < 0)
-		return 0;
-
-	if ((start + blkcnt) > block_dev->lba) 
-	{
-#if !defined(CONFIG_SPL_BUILD) || defined(CONFIG_SPL_LIBCOMMON_SUPPORT)
-		pr_err("MMC: block number 0x" LBAF " exceeds max(0x" LBAF ")\n",
-		       start + blkcnt, block_dev->lba);
-#endif
-		return 0;
-	}
-#endif
-
 	if (mmc_set_blocklen(mmc, mmc->read_bl_len)) 
 	{
 		//pr_debug("%s: Failed to set blocklen\n", __func__);
@@ -208,7 +187,11 @@ int sd_init(void)
     ucp_mmc.dsr			= 0xffffffff;
     err = mmc_init(&ucp_mmc);	
 	if(err)
+    {
 	  debug("%s: Failed in mmc_init(). \n\r", __func__);
+      return -1;
+    }
+    return 0;
 }
 
 
@@ -272,9 +255,7 @@ void print_mmcinfo(struct mmc *mmc)
 int  sd_fs_read(void) // sd driver file system read
 {
    timer_init();
-   //test_timer();
-   sd_init();
-   //print_mmcinfo(&ucp_mmc);
+   if(sd_init() != 0) return false;
 
    int loadfile(void *addr);
    if(loadfile((void*)0x04e60000) == false) return false;

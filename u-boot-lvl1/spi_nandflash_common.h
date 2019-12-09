@@ -12,22 +12,23 @@
 #include "crc32.h"
 #include "uart.h"
 
-#define page 2048
 enum{
 uboot_page = 0x4,
-ddr_page,
 image_page,
 image_dts
 };
-#define nandflash_startAddr  (page * uboot_page)
-#define Block_Size 0x20000 // 128KB
-#define head_len 0x800 // 2k
-#define copy_addr 0x04e60000
+
 enum{
 boot2 = 0,
 OS_Image,
 device_tree
 };
+
+#define page 2048
+#define nandflash_startAddr  (page * uboot_page) // nandflash store uboot.bin addr
+#define Block_Size 0x20000 // 128KB
+#define head_len 0x800 // 2k
+#define copy_addr 0x04e60000    // uboot store addr on SM0-3
 
 typedef struct{
 unsigned int op_type;

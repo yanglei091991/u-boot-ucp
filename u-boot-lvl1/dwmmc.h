@@ -13,6 +13,8 @@
 #include "sd_common.h"
 #include "mmc.h"
 
+#define  UCP_SDIO_BASE       0x02050000
+
 #define DWMCI_CTRL		0x000
 #define	DWMCI_PWREN		0x004
 #define DWMCI_CLKDIV		0x008

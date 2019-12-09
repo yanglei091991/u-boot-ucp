@@ -3,8 +3,6 @@
 
 #include "gpio.h"
 
-#pragma GCC push_options
-#pragma GCC optimize ("O0")
 
 
 #if  0
@@ -121,9 +119,6 @@ void  drv_gpio_init(void)
 
 
 }
-
-#pragma GCC pop_options
-
 
 
 

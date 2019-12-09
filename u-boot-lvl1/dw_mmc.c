@@ -20,7 +20,6 @@
 #include "errno.h"
 #include "mmc.h"
 #include "dwmmc.h"
-#include "sd_common.h"
 #endif
 
 #define PAGE_SIZE 4096
@@ -545,8 +544,8 @@ void dwmci_setup_cfg(struct mmc_config *cfg, struct dwmci_host *host,
 		cfg->host_caps |= MMC_MODE_4BIT;
 		cfg->host_caps &= ~MMC_MODE_8BIT;
 	}
-	cfg->host_caps |= MMC_MODE_HS | MMC_MODE_HS_52MHz;
-
+	//cfg->host_caps |= MMC_MODE_HS | MMC_MODE_HS_52MHz;
+    cfg->host_caps |= MMC_CAP(SD_HS);
 	cfg->b_max = CONFIG_SYS_MMC_MAX_BLK_COUNT;
 }
 
@@ -560,5 +559,11 @@ int add_dwmci(struct dwmci_host *host, u32 max_clk, u32 min_clk)
 		return -1;
 
 	return 0;
+}
+
+/* 0 = presence of card, 1--no card */
+unsigned int sd_detect(void)
+{    
+   return readl( UCP_SDIO_BASE + DWMCI_CDETECT);
 }
 

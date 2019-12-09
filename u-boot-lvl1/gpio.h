@@ -9,12 +9,8 @@
 
 #define GPIOS_PER_PORT		32
 
-#if  0
-#define   GPIOADDR_BASE   0x42050000
-#else
-#define   GPIOADDR_BASE   0x02118000
-
-#endif
+#define   GPIOADDR_BASE   0x02118000   /* GPIO0 */
+#define   GPIO1_BASE      0x04a40000   /* GPIO1 */
 
 #define   gpio_swporta_dr      (*(volatile unsigned int *)(GPIOADDR_BASE+0x000)) //GPIO 
 #define   gpio_swporta_ddr    (*(volatile unsigned int  *)(GPIOADDR_BASE+0x004)) //GPIO 
@@ -69,9 +65,7 @@
 #define   GPIO_LED2_PIN               GPIO_Pin_21     /* AP_GPIOB21 */
 
 
-
 /* GPIO_Pin定义 */
-#if(GPIOS_PER_PORT == 32)
 	#define GPIO_Pin_0                 (0x00000001)  /*!< Pin 0 selected */
 	#define GPIO_Pin_1                 (0x00000002)  /*!< Pin 1 selected */
 	#define GPIO_Pin_2                 (0x00000004)  /*!< Pin 2 selected */
@@ -106,25 +100,6 @@
 	#define GPIO_Pin_31                (0x80000000)  /*!< Pin 31 selected */
 	#define GPIO_Pin_All               (0xFFFFFFFF)  /*!< All pins selected */
 
-#elif(GPIOS_PER_PORT == 16)
-	#define GPIO_Pin_0                 (0x0001)  /*!< Pin 0 selected */
-	#define GPIO_Pin_1                 (0x0002)  /*!< Pin 1 selected */
-	#define GPIO_Pin_2                 (0x0004)  /*!< Pin 2 selected */
-	#define GPIO_Pin_3                 (0x0008)  /*!< Pin 3 selected */
-	#define GPIO_Pin_4                 (0x0010)  /*!< Pin 4 selected */
-	#define GPIO_Pin_5                 (0x0020)  /*!< Pin 5 selected */
-	#define GPIO_Pin_6                 (0x0040)  /*!< Pin 6 selected */
-	#define GPIO_Pin_7                 (0x0080)  /*!< Pin 7 selected */
-	#define GPIO_Pin_8                 (0x0100)  /*!< Pin 8 selected */
-	#define GPIO_Pin_9                 (0x0200)  /*!< Pin 9 selected */
-	#define GPIO_Pin_10                (0x0400)  /*!< Pin 10 selected */
-	#define GPIO_Pin_11                (0x0800)  /*!< Pin 11 selected */
-	#define GPIO_Pin_12                (0x1000)  /*!< Pin 12 selected */
-	#define GPIO_Pin_13                (0x2000)  /*!< Pin 13 selected */
-	#define GPIO_Pin_14                (0x4000)  /*!< Pin 14 selected */
-	#define GPIO_Pin_15                (0x8000)  /*!< Pin 15 selected */
-	#define GPIO_Pin_All               (0xFFFF)  /*!< All pins selected */	
-#endif
 
 
 /* GPIO主要函数声明 */

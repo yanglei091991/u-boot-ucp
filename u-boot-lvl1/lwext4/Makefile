@@ -16,6 +16,6 @@ main: main.o file_dev.o lwext4.a
 	$(CC) $(CFLAGS) -o main $^
 
 clean:
-	bash -c "rm -f *.a main *.o *.gcov *.gcda *.gcno"
+	bash -c "rm -f *.a main *.o"
 
 .PHONY: clean

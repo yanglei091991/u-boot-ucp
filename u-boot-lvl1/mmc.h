@@ -600,7 +600,7 @@ struct mmc
 	int high_capacity;
 	bool clk_disable; /* true if the clock can be turned off */
 	uint bus_width;
-	uint clock;        /* SD卡的工作时钟 */
+	uint clock;        /* SD卡的当前工作时钟 */
 	enum mmc_voltage signal_voltage;
 	uint card_caps;    /* SD卡 能力 */
 	uint host_caps;    /* host 能力 */

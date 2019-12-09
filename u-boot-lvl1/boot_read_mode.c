@@ -7,6 +7,7 @@
 #include "uart.h"
 #endif
 
+#ifdef  UART
 void  print_boot_cfg(void)
 {
     unsigned  int  boot_cfg;
@@ -14,24 +15,22 @@ void  print_boot_cfg(void)
     boot_cfg = A53_M3_REMAP;
     if(boot_cfg&BOOT_CFG_SYNC)
       {
-#ifdef  UART
-        Uart_Printf("BOOT1 GPMC! \n\r");
-#endif
+        Uart_Printf("BOOT1 from external GPMC! \n\r");
         if(boot_cfg&BOOT_CTL_SYNC5)
         {
-#ifdef  UART
             Uart_Printf("--from nor flash! \n\r");
-#endif 
+        }
+        else
+        {
+            Uart_Printf("--from SRAM! \n\r");
         }
       }
     else
     {
-#ifdef  UART
-        Uart_Printf("BOOT1 ROM! \n\r");
-#endif   
+        Uart_Printf("BOOT1 from On-Chip ROM! \n\r");  
     }  
 }
-
+#endif 
 
 /* internal ROM BOOT */
 unsigned char  read_uboot_mode(void)
@@ -41,18 +40,23 @@ unsigned char  read_uboot_mode(void)
     unsigned char *dest = (unsigned char*)copy_addr;
     unsigned int boot_size = 0;
 
+#ifdef  UART
     print_boot_cfg();
+#endif    
     boot_cfg = A53_M3_REMAP;    
     if(boot_cfg&BOOT_CTL_SYNC4)
-    { /* uboot from SPI0 flash */
+    { /* uboot from SPI0 nand flash */
     
 #ifdef  SOC_PRJ 
       /* SOC use spio0, spi0 must be pinmux init;fpga test use fpga SPI2 */
       spi0_pin_init();
+#else
+      /* spi2_ssn used for gpio--output  */
+      spi2_ssn_gpio_init();
 #endif      
       
 #ifdef  UART   
-      Uart_Printf("BOOT2 SPI nand! \n\r");
+      Uart_Printf("BOOT2 from SPI nand! \n\r");
 #endif    
 
       /* init spi, read uboot from spi flash */
@@ -73,19 +77,22 @@ unsigned char  read_uboot_mode(void)
     }
     else
     { /* uboot from SDIO */
+
+#ifdef  MMC_CARD_DETECT    
+     sd_detect_pin_init();
+#endif     
+    
 #ifdef  UART
-        Uart_Printf("BOOT2 SD card! \n\r");
+        Uart_Printf("BOOT2 from SD card! \n\r");
 #endif
         /* init sdio, read uboot from sd card */     
        if(sd_fs_read() == false)
-       {
-       
+       { 
 #ifdef  UART   
           Uart_Printf("BOOT1 copy boot2 from SD Failed! \n\r");
 #endif        
         return false;  
        }
-
 #ifdef  UART   
           Uart_Printf("BOOT1 copy boot2 from SD ok! \n\r");
 #endif 	  

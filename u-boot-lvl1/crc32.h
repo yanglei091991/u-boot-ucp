@@ -77,5 +77,5 @@ extern int crc_ok;
 //
 **************************************************************************/
 
-unsigned short crc16(char* data_p, unsigned short length);
+//unsigned short crc16(char* data_p, unsigned short length);
 unsigned int crc32(char *p_data, unsigned int length);

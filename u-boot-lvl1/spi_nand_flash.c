@@ -8,12 +8,12 @@
 #include "spi_nand_flash.h"
 #include "gpio.h"
 #include "sd_common.h"
+#include "pinmux.h"
 
-
-#define NAND_SPI_ER_STATUS_P_FAIL       (1 << 3)		//写入失败标记
-#define NAND_SPI_ER_STATUS_E_FAIL       (1 << 2)		//擦除失败标记
-#define NAND_SPI_ER_STATUS_WEL          (1 << 1)		//允许写入标记
-#define NAND_SPI_ER_STATUS_OIP          (1 << 0)		//设备忙碌标记
+//#define NAND_SPI_ER_STATUS_P_FAIL       (1 << 3)		//写入失败标记
+//#define NAND_SPI_ER_STATUS_E_FAIL       (1 << 2)		//擦除失败标记
+//#define NAND_SPI_ER_STATUS_WEL          (1 << 1)		//允许写入标记
+//#define NAND_SPI_ER_STATUS_OIP          (1 << 0)		//设备忙碌标记
 
 #define    FIFO_LEN    16
  //
@@ -22,12 +22,13 @@ unsigned int  gNandFlashType;
 unsigned char  gFlashSize;
 unsigned char  gRxDat[2048+128];
 
-
+#if 0
 void drv_delay(volatile unsigned int num)
 {
 
 	while(num--);
 }
+#endif
 
 void  Rx_FIFO_empty(void)
 {
@@ -54,13 +55,22 @@ unsigned char rt_spi_send_then_recv(unsigned char *send_buf,
 
     total = rx_len+tx_len;
     pRxdat = gRxDat;
+
+#ifdef  SOC_PRJ 
+      /* SOC use spio0, spi0_cs =0  */
+     spi0_ssn_gpio_set_value(0); 
+#else
+    /* fpga test use fpga SPI2, spi2_cs =0 */
+    spi2_ssn_gpio_set_value(0);
+#endif
+    
     while( Tx_FIFO_EMPTY != (SR & Tx_FIFO_EMPTY));
     Rx_FIFO_empty();  /* 接收FIFO读空 */
-
+    
     while((tByte<total)||(rByte<total))
     {
-           //while (( Tx_FIFO_NO_FULL == (SR & Tx_FIFO_NO_FULL))&&(tByte< total))
-           if(( Tx_FIFO_NO_FULL == (SR & Tx_FIFO_NO_FULL))&&(tByte< total))
+           while (( Tx_FIFO_NO_FULL == (SR & Tx_FIFO_NO_FULL))&&(tByte< total))
+           //if(( Tx_FIFO_NO_FULL == (SR & Tx_FIFO_NO_FULL))&&(tByte< total))
            {
                  if(tByte< tx_len)
                      DR = (unsigned int)(*send_buf);
@@ -78,6 +88,14 @@ unsigned char rt_spi_send_then_recv(unsigned char *send_buf,
            }
 
       }
+
+#ifdef  SOC_PRJ 
+      /* SOC use spio0, spi0_cs =1  */
+     spi0_ssn_gpio_set_value(1); 
+#else
+    /* fpga test use fpga SPI2, spi2_cs =1 */
+    spi2_ssn_gpio_set_value(1);
+#endif
 
 #if  0
 	if(rx_len)
@@ -144,36 +162,20 @@ unsigned char spi_nand_get_feature(unsigned char reg, unsigned char *data)
 unsigned char nandflash_busy_wait(unsigned char *data)
 {
     int i;
-    for (i = 0; i < 4000; i++)
+    for (i = 0; i < CHECK_NUM; i++)
     {
         spi_nand_get_feature(0xC0, data);
         if (!(*data & NAND_SPI_ER_STATUS_OIP))
             break;
     }
 
-    if(i>0) 
-    	return 0;
+    if  (i < CHECK_NUM) 
+    	return  DRV_OK;
     else 
-    	return 1;
-
+    	return  WAIT_TIMEOUT;
 }
 
 
-//读特征字寄存器状态位是允许写入
-//unsigned char *data  返回状态寄存器C0H的值
-unsigned char nandflash_WEL_wait(unsigned char *data)
-{
-    int i;
-    for (i = 0; i < 4000; i++)
-    {
-        spi_nand_get_feature(0xC0, data);
-        if (!(*data & (NAND_SPI_ER_STATUS_WEL+NAND_SPI_ER_STATUS_OIP)))
-            break;
-    }
-
-    if(i>0) return 0;
-    else return 1;
-}
 //读取NANDFLASH的ID号
 //unsigned char *rxiD   返回的NADNFLASH ID
 unsigned char nandflash_readid(unsigned char *RxID)
@@ -240,7 +242,7 @@ unsigned char nandflash_read(unsigned int         src_row_addr,
 
      if ((src_col_addr+data_len) <= PAGE_SIZE)
      	{
-           if (ECC_ERROR == nandflash_readpage(src_row_addr, dst_addr, src_col_addr,   data_len))
+           if (DRV_OK != nandflash_readpage(src_row_addr, dst_addr, src_col_addr,   data_len))
               {
                 return  ECC_ERROR;
              }
@@ -248,30 +250,30 @@ unsigned char nandflash_read(unsigned int         src_row_addr,
      else
      	{
 		    while(totalBytes < data_len )
-		    	{
+		    {
             if (0==totalBytes)
                {
-                    if (ECC_ERROR == nandflash_readpage(src_row_addr, (unsigned char *)(dst_addr+totalBytes), src_col_addr,   PAGE_SIZE-src_col_addr))
+                    if (DRV_OK !=  nandflash_readpage(src_row_addr, (unsigned char *)(dst_addr+totalBytes), src_col_addr,   PAGE_SIZE-src_col_addr))
                    {
                       return  ECC_ERROR;
                    }                  
                   totalBytes += 2048-src_col_addr;
                }
-		    	   else
-		    	      {
-		    	           nBytes = m_min((data_len-totalBytes),PAGE_SIZE);
-                 if (ECC_ERROR == nandflash_readpage(src_row_addr, (unsigned char *)(dst_addr+totalBytes), 0,   nBytes))                 
-                    {
-                        return  ECC_ERROR;
-                   }  
-		    	           totalBytes += nBytes;
-		    	      }
+		    else
+		     {
+		    	nBytes = m_min((data_len-totalBytes),PAGE_SIZE);
+                if (DRV_OK != nandflash_readpage(src_row_addr, (unsigned char *)(dst_addr+totalBytes), 0,   nBytes))                 
+                {
+                  return  ECC_ERROR;
+                }  
+		    	totalBytes += nBytes;
+		    }
 		    	   
-		    	     page = (src_row_addr & 0x3F);
-		    	     block = (src_row_addr & 0x1FFC0)>>6;             
-              block += (page+1)/PAGE_NUM;
-              page = (page  +1)& 0x3F;              
-              src_row_addr = (block<<6) |page ;
+		    page = (src_row_addr & 0x3F);
+		    block = (src_row_addr & 0x1FFC0)>>6;             
+            block += (page+1)/PAGE_NUM;
+            page = (page  +1)& 0x3F;              
+            src_row_addr = (block<<6) |page ;
 		    }
      	}
 
@@ -373,7 +375,8 @@ int spi_nand_flash_init(void)
 {
 	   unsigned char rxbuf[4];
 
-	   spi_init();
+       /* SOC use spio0, fpga test use SPI2 */
+	   spi_init();	   
 	   us_delay(100);
 	   nandflash_reset();
 	   nandflash_readid(rxbuf);                   //读出NAND FLASH ID号

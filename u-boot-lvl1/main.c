@@ -14,6 +14,7 @@
 #include "config_pll.h"
 #include "sd_common.h"
 #include "boot_read_mode.h"
+#include "pinmux.h"
 
 extern char __bss_start__[], __bss_end__[];
 extern void __libc_init_array(void);
@@ -34,7 +35,7 @@ unsigned int config_pll(void)
     PLL3_CONFIG0 = (3 << 12) + (1 << 15) + 75; // 500MHz
     // pll1 enable
     PLL1_CTRL |= 1;
-    // PLL3 enable
+    // PLL3 enable, A53
     PLL3_CTRL |= 1;
     
     // add delay(50us);
@@ -76,6 +77,7 @@ int main()
                     (unsigned int)data_size);
   }
 
+  
 // config pll clock
 #ifdef  SOC_PRJ
    config_pll();

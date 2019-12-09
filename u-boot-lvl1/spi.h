@@ -86,7 +86,7 @@ SPI3	  0x04a10000
 
 
 #ifdef SOC_PRJ
-    #define  SPI_CLK     2500000     /* soc clock = 2.5M */	
+    #define  SPI_CLK     1000000     /* soc clock = 1.0M */	
 #else	
 	#define  SPI_CLK     250000      /* FPGA clock= 250k */
 #endif

@@ -3,9 +3,11 @@
 #ifndef SD_COMMON_H_
 #define SD_COMMON_H_
 
-#define   SELF_TEST
 
 #include <stdbool.h>
+
+#define  MMC_CARD_DETECT
+#define  CONFIG_MMC_QUIRKS
 
 typedef unsigned char		uchar;
 typedef volatile unsigned long	vu_long;

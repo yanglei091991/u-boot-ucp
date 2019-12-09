@@ -93,20 +93,24 @@ bootcode:
                 ands    r0, r0, #0xFF           // r0 == CPU number
                 cmp     r0, #1                  // cpu1 run
                 beq     cpu1_jump
-                // CRG reg init
-                ldr     r0,  =0x00003B05
-                ldr     r1,  =0x03670060
+
+                // CRG reg init, wakeup core1
+                ldr     r0, =DEV_ENA_REG2_ADDR 
+                ldr     r1, [r0]
+                mov     r2, #0xe07      // core1 wakeup reg config
+                orr     r1, r1, r2
+                str     r1, [r0]
+                ldr     r0, =0xFFFFFFFF
+                ldr     r1, =DEV_ENA_REG1_ADDR // 0x0367005c
                 str     r0, [r1]
-                ldr     r0,  =0xFFFFFFFF
-                ldr     r1,  =0x0367005C
-                str     r0, [r1]
-                // cpu1 wakeup start
-                ldr r1, =CPU1_RESET_ADDR
-                ldr r1, [r1]
-                mov r2, #2
-                orr r1, r1, r2
-                ldr r3, =CPU1_RESET_ADDR
-                str r1, [r3]
+               
+                 // cpu1 wakeup start
+//                ldr r1, =DEV_ENA_REG2_ADDR // 0x03670060
+//                ldr r1, [r1]
+//                mov r2, #2
+//                orr r1, r1, r2
+//                ldr r3, =DEV_ENA_REG2_ADDR
+//                str r1, [r3]
                 // cpu1 wakeup end
                 b     cpu_start
 
