@@ -3,7 +3,7 @@
 int read_arr_index = 0;
 unsigned char (* nandflash_read_arr[])(unsigned int,unsigned int,unsigned char*,unsigned int) = {nandflash_read};
 
-bool copy_boot2_to_ram(unsigned int *src, unsigned char *dest, unsigned int *boot_size)
+bool copy_boot2_to_ram(unsigned int *src, unsigned char *dest)
 {
   unsigned int rowAddr = ((unsigned int)src&0x1FFFF800)>>11;
   unsigned int colAddr = (unsigned int)src&0x7FF;
@@ -23,7 +23,6 @@ bool copy_boot2_to_ram(unsigned int *src, unsigned char *dest, unsigned int *boo
   nand_head.op_type = (*pNandHead)|(*(pNandHead + 1))<<16;
   pNandHead = pNandHead + 2;
   nand_head.byte_size = (*pNandHead)|(*(pNandHead + 1))<<16;
-  *boot_size = nand_head.byte_size;
   pNandHead = pNandHead + 2;
   nand_head.crc = (*pNandHead)|(*(pNandHead + 1))<<16;
   pNandHead = pNandHead + 2;

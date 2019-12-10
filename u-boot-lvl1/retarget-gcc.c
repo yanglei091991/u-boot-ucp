@@ -82,7 +82,8 @@ extern int main(int argc, char **argv);
 int _arm_start()
 {
     init_libc();
-    main(0, NULL);
+   if( main(0, NULL) == 1)
+        exit(1);
 //    exit(main(0, NULL));
 }
 

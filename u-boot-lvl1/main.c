@@ -7,8 +7,6 @@
 #include <sys/times.h>
 #include <sys/stat.h>
 #include <unistd.h>
-
-#include "uart.h"
 #include "gpio.h"
 #include "ddr_test.h"
 #include "config_pll.h"
@@ -16,9 +14,9 @@
 #include "boot_read_mode.h"
 #include "pinmux.h"
 
-extern char __bss_start__[], __bss_end__[];
-extern void __libc_init_array(void);
-extern void __libc_fini_array(void);
+#ifdef  UART
+#include "uart.h"
+#endif
 
 void copy_data_to_ram(unsigned char *src,
                       unsigned char *dest, unsigned int len)
@@ -76,8 +74,7 @@ int main()
                      __data_start,
                     (unsigned int)data_size);
   }
-
-  
+ 
 // config pll clock
 #ifdef  SOC_PRJ
    config_pll();
@@ -93,12 +90,12 @@ int main()
 
 #endif
 
-  boot_uart_init();
 #ifdef  UART
+  boot_uart_init();
   Uart_Printf("UART init success! \n\r");
 #endif  
 
-  read_uboot_mode();
+  if(read_uboot_mode() == false) return 1;
  
   return 0;
 }

@@ -10,7 +10,10 @@
 #include <stdbool.h>
 #include "spi_nand_flash.h"
 #include "crc32.h"
+
+#ifdef UART
 #include "uart.h"
+#endif
 
 enum{
 uboot_page = 0x4,
@@ -38,7 +41,7 @@ unsigned int head_end;
 }NandFlash_Head;
 
 
-bool copy_boot2_to_ram(unsigned int *src, unsigned char *dest, unsigned int *boot_ize);
+bool copy_boot2_to_ram(unsigned int *src, unsigned char *dest);
 
 // define function point arr support mang manufacturer spi nand flash driver
 extern int read_arr_index;

@@ -194,64 +194,6 @@ int sd_init(void)
     return 0;
 }
 
-
-#if 0
-void udelay(unsigned long usec);
-
-void  test_timer(void)
-{
-    ulong start;
-	unsigned  int  stop,i;
-
-   for(i=1;i<20;i=2*i)
-   {
-     start = get_timer(0);
-     udelay(100*i);
-     stop = get_timer(start);
-     debug("delay is %d:\n\r",stop);
-   	}    
-}
-
-void print_mmcinfo(struct mmc *mmc)
-{
-	//int i;
-
-	debug("Device: %s\n\r", mmc->cfg->name);
-	debug("Manufacturer ID: %x\n\r", mmc->cid[0] >> 24);
-	debug("OEM: %x\n\r", (mmc->cid[0] >> 8) & 0xffff);
-	debug("Name: %c%c%c%c%c \n\r", mmc->cid[0] & 0xff,
-			(mmc->cid[1] >> 24), (mmc->cid[1] >> 16) & 0xff,
-			(mmc->cid[1] >> 8) & 0xff, mmc->cid[1] & 0xff);
-
-	debug("Bus Speed: %d\n\r", mmc->clock);
-	debug("Mode : %s\n\r", mmc_mode_name(mmc->selected_mode));
-	debug("card capabilities:0x%x \n\r", mmc->card_caps);
-	debug("host capabilities:0x%x \n\r", mmc->host_caps);
-	
-	debug("Rd Block Len: %d\n\r", mmc->read_bl_len);
-
-	debug("%s version %d.%d", IS_SD(mmc) ? "SD" : "MMC",
-			EXTRACT_SDMMC_MAJOR_VERSION(mmc->version),
-			EXTRACT_SDMMC_MINOR_VERSION(mmc->version));
-	if (EXTRACT_SDMMC_CHANGE_VERSION(mmc->version) != 0)
-		debug(".%d", EXTRACT_SDMMC_CHANGE_VERSION(mmc->version));
-	debug("\n\r");
-
-	debug("High Capacity: %s\n\r", mmc->high_capacity ? "Yes" : "No");
-	debug("Capacity: %d \n\r",mmc->capacity);
-	//debug(mmc->capacity, "\n");
-
-	debug("Bus Width: %d-bit%s\n", mmc->bus_width,
-			mmc->ddr_mode ? " DDR" : "");
-
-#ifdef MMC_WRITE
-	puts("Erase Group Size: ");
-	print_size(((u64)mmc->erase_grp_size) << 9, "\n");
-#endif
-}
-
-#endif
-
 int  sd_fs_read(void) // sd driver file system read
 {
    timer_init();

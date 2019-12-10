@@ -94,10 +94,10 @@ bootcode:
                 cmp     r0, #1                  // cpu1 run
                 beq     cpu1_jump
 
-                // CRG reg init, wakeup core1
+                // CRG reg init, wakeup cpu1
                 ldr     r0, =DEV_ENA_REG2_ADDR 
                 ldr     r1, [r0]
-                mov     r2, #0xe07      // core1 wakeup reg config
+                mov     r2, #0xe07      // cpu1 wakeup reg config
                 orr     r1, r1, r2
                 str     r1, [r0]
                 ldr     r0, =0xFFFFFFFF
