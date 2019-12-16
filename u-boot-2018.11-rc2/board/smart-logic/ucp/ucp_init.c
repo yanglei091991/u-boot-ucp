@@ -39,7 +39,18 @@ void copy_ddr_ref(void)
     memcpy((int*)ICCM_BASE_ADDR, iccm_arr, sizeof(iccm_arr));
 }
 
- void ucp_timer_init(void)
+void ucp_ddr_init(void)
+{
+    // ddr controller enable
+    volatile int* DEV_ENA_REG2_ADDR = (volatile int*)0x03670060;
+    int ddrc_ena = 0x200;
+    *DEV_ENA_REG2_ADDR |= ddrc_ena; 
+
+    copy_ddr_ref();
+//    ddr_init();
+}
+
+void ucp_timer_init(void)
 {
 	/*
 	 * Set Timer0 to be:
@@ -59,6 +70,7 @@ int dram_init_banksize(void)
 
 int dram_init(void)
 {
+    ucp_ddr_init();
 	gd->ram_size =
 		get_ram_size((long *)PHYS_SDRAM_1, PHYS_SDRAM_1_SIZE);
 	return 0;
@@ -70,8 +82,6 @@ int board_init(void)
 	gd->bd->bi_arch_number = MACH_TYPE_UCP;
 	ucp_timer_init();
     spi2_ssn_gpio_init();
-    copy_ddr_ref();
-//    ddr_init();
 
     return 0;
 }
