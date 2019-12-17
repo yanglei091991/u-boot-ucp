@@ -3,18 +3,13 @@
 
 #ifndef __NAND_FLASH_H__
 #define __NAND_FLASH_H__
-
-
-/* C版本GD5F1GQ4UC  */
-#define GD5F1GQ4U 	0XC8B148
-#define GD5F2GQ4U 	0XC8B248
-#define GD5F1GQ4R 	0XC8A148
-#define GD5F2GQ4R 	0XC8A248
             
 
 /* B 版本 */
 #define GD5F1GQ4RB 	0XC8C1     /* 1Gbit,  B version, 1.8v */
 #define GD5F2GQ4RB 	0XC8C2     /* 2Gbit,  B version, 1.8v */
+#define GD5F1GQ4UB 	0XC8D1     /* 1Gbit,  B version, 3.3v */
+#define GD5F2GQ4UB 	0XC8D2     /* 2Gbit,  B version, 3.3v */
 
 
 #define NAND_SPI_ER_STATUS_P_FAIL       (1 << 3)		//写入失败标记

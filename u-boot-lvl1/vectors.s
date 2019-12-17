@@ -62,98 +62,15 @@ data_abort_handler_addr: .word     def_data_abort_handler
 irq_handler_addr:        .word     def_irq_handler
 fiq_handler_addr:        .word     def_fiq_handler
 
-
-//----------------------------------------------------------------------------
-// Handler strings
-//----------------------------------------------------------------------------
-
-// The default handlers print an error message and terminate the simulation
-// by writing the EOT character to the tube.  The error strings are defined
-// here.
-undef_exception_str:      .asciz "undefined instruction\n"
-svc_exception_str:        .asciz "SVC\n"
-pf_abort_exception_str:   .asciz "prefetch abort\n"
-data_abort_exception_str: .asciz "data abort\n"
-irq_exception_str:        .asciz "IRQ\n"
-fiq_exception_str:        .asciz "FIQ\n"
-
-// Ensure 4-byte alignment for following code
-.balign 4
-
-
-//------------------------------------------------------------------------------
-// Default handlers
-//
-//   The default handlers all contain one branch to a weakly-imported exception
-//   handler label followed by default handler code.  This allows tests to
-//   define their own handlers, with fall-back default handlers if they do not.
-//
-//   When a test defines a replacement handler, it must end with an excpetion
-//   return instruction so that the default handler code is never executed.
-//
-//   When a test does not define a replacement handler, the branch to the
-//   weakly-imported symbol in the default handler is effectively a NOP and
-//   the default handler code is therefore executed.
-//
-//   The default handlers all print an "Unexpected exception" error message
-//   and terminate the simulation by writing the EOT character to the tube.
-//------------------------------------------------------------------------------
-
-def_undef_handler:      b       undef_handler
-                        ldr     r0, =undef_exception_str
-                        b       unexpected_handler
-
-def_svc_handler:        b       svc_handler
-                        ldr     r0, =svc_exception_str
-                        b       unexpected_handler
-
-def_pf_abort_handler:   b       pf_abort_handler
-                        ldr     r0, =pf_abort_exception_str
-                        b       unexpected_handler
-
-def_data_abort_handler: b       data_abort_handler
-                        ldr     r0, =data_abort_exception_str
-                        b       unexpected_handler
-
-def_irq_handler:        b       irq_handler
-                        ldr     r0, =irq_exception_str
-                        b       unexpected_handler
-
-def_fiq_handler:        b       fiq_handler
-                        ldr     r0, =fiq_exception_str
-                        b       unexpected_handler
-
-// Generic unexpected handler routine.  This prints an error message and
-// terminates the simulation by writing the EOT character to the tube.
-// Expects r0 to contain a pointer to a string that is the name of the
-// exception.  As this is a terminal routine, no registers are preserved.
-unexpected_handler:
-                ldr     r1, =#0x13000000        // Tube address
-                ldr     r2, =unexpected_str     // Message
-                bl      print
-                mov     r2, r0
-                bl      print
-                ldr     r2, =fail_str
-                bl      print
-
-                // Write EOT character to terminate the simulation
-                mov     r2, #0x4
-                strb    r2, [r1]
-                b       .
-
-                // Print a string to the tube
-                //   Expects: r1 -> tube
-                //            r2 -> message
-                //   Modifies r3
-print:          ldrb    r3, [r2], #1
-                cmp     r3, #0
-                strbne  r3, [r1]
-                bne     print
-                bx      lr
-
-                .balign 4
-unexpected_str: .asciz "Unexpected exception: "
-fail_str:       .asciz "** TEST FAILED **\n"
+.balign	4
+def_undef_handler:
+def_svc_handler:
+def_pf_abort_handler:
+def_data_abort_handler:
+def_irq_handler:
+def_fiq_handler:
+1:
+	b	1b			/* hang and never return */
 
                 .end
 

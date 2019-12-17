@@ -1,26 +1,11 @@
-// SPDX-License-Identifier: GPL-2.0+
-/*
- * (C) Copyright 2012 SAMSUNG Electronics
- * Jaehoon Chung <jh80.chung@samsung.com>
- * Rajeshawari Shinde <rajeshwari.s@samsung.com>
- */
 
-#if  0
-#include <bouncebuf.h>
-#include <spi_nandflash_common.h>
-#include <errno.h>
-#include <malloc.h>
-#include <memalign.h>
-#include <mmc.h>
-#include <dwmmc.h>
-#include <asm-generic/errno.h>
-#else
+
 #include <stdio.h>
 #include "sd_common.h"
 #include "errno.h"
 #include "mmc.h"
 #include "dwmmc.h"
-#endif
+
 
 #define PAGE_SIZE 4096
 
@@ -115,7 +100,6 @@ static int dwmci_fifo_ready(struct dwmci_host *host, u32 bit, u32 *len)
 	}
 
 	if (!timeout) {
-		debug("%s: FIFO underflow timeout\n", __func__);
 		return -ETIMEDOUT;
 	}
 
@@ -142,7 +126,6 @@ static int dwmci_data_transfer(struct dwmci_host *host, struct mmc_data *data)
 		mask = dwmci_readl(host, DWMCI_RINTSTS);
 		/* Error during data transfer. */
 		if (mask & (DWMCI_DATA_ERR | DWMCI_DATA_TOUT)) {
-			debug("%s: DATA ERROR!\n", __func__);
 			ret = -EINVAL;
 			break;
 		}
@@ -199,8 +182,6 @@ static int dwmci_data_transfer(struct dwmci_host *host, struct mmc_data *data)
 
 		/* Check for timeout. */
 		if (get_timer(start) > timeout) {
-			debug("%s: Timeout waiting for data!\n",
-			      __func__);
 			ret = -ETIMEDOUT;
 			break;
 		}
@@ -239,7 +220,6 @@ static int dwmci_send_cmd(struct mmc *mmc, struct mmc_cmd *cmd,
 
 	while (dwmci_readl(host, DWMCI_STATUS) & DWMCI_BUSY) {
 		if (get_timer(start) > timeout) {
-			debug("%s: Timeout on data busy\n", __func__);
 			return -ETIMEDOUT;
 		}
 	}
@@ -257,20 +237,7 @@ static int dwmci_send_cmd(struct mmc *mmc, struct mmc_cmd *cmd,
 		
 		else 
 		{
-#if  0		
-			if (data->flags == MMC_DATA_READ) {
-				bounce_buffer_start(&bbstate, (void*)data->dest,
-						data->blocksize *
-						data->blocks, GEN_BB_WRITE);
-			} else {
-				bounce_buffer_start(&bbstate, (void*)data->src,
-						data->blocksize *
-						data->blocks, GEN_BB_READ);
-			}
-			
-			dwmci_prepare_data(host, data, cur_idmac,
-					   bbstate.bounce_buffer);
-#endif
+
 			if (data->flags == MMC_DATA_READ) 
 			{
 			   dwmci_prepare_data(host, data, cur_idmac,(void*)data->dest);				
@@ -309,8 +276,6 @@ static int dwmci_send_cmd(struct mmc *mmc, struct mmc_cmd *cmd,
 
 	flags |= (cmd->cmdidx | DWMCI_CMD_START | DWMCI_CMD_USE_HOLD_REG);
 
-	debug("Sending CMD%d\n",cmd->cmdidx);
-
 	dwmci_writel(host, DWMCI_CMD, flags);
 
 	for (i = 0; i < retry; i++) {
@@ -323,7 +288,6 @@ static int dwmci_send_cmd(struct mmc *mmc, struct mmc_cmd *cmd,
 	}
 
 	if (i == retry) {
-		debug("%s: Timeout.\n", __func__);
 		return -ETIMEDOUT;
 	}
 
@@ -336,10 +300,8 @@ static int dwmci_send_cmd(struct mmc *mmc, struct mmc_cmd *cmd,
 		 * below shall be debug(). eMMC cards also do not favor
 		 * CMD8, please keep that in mind.
 		 */
-		debug("%s: Response Timeout.\n", __func__);
 		return -ETIMEDOUT;
 	} else if (mask & DWMCI_INTMSK_RE) {
-		debug("%s: Response Error.\n", __func__);
 		return -EIO;
 	}
 
@@ -386,16 +348,15 @@ static int dwmci_setup_bus(struct dwmci_host *host, u32 freq)
 	 * then assume that host->bus_hz is source clock value.
 	 * host->bus_hz should be set by user.
 	 */
-	if (host->get_mmc_clk)                /* 从get_mmc_clk读SD卡时钟 */
+	if (host->get_mmc_clk)
 		sclk = host->get_mmc_clk(host, freq);
-	else if (host->bus_hz)                /* 如果get_mmc_clk没有配置, 从bus_hz读SD卡时钟 */
+	else if (host->bus_hz)
 		sclk = host->bus_hz;
 	else {
-		debug("%s: Didn't get source clock value.\n", __func__);
 		return -EINVAL;
 	}
 
-	if (sclk == freq)                   /* 如果时钟相同 */
+	if (sclk == freq)
 		div = 0;	/* bypass mode */
 	else
 		div = DIV_ROUND_UP(sclk, 2 * freq);
@@ -410,7 +371,6 @@ static int dwmci_setup_bus(struct dwmci_host *host, u32 freq)
 	do {
 		status = dwmci_readl(host, DWMCI_CMD);
 		if (timeout-- < 0) {
-			debug("%s: Timeout!\n", __func__);
 			return -ETIMEDOUT;
 		}
 	} while (status & DWMCI_CMD_START);
@@ -425,7 +385,6 @@ static int dwmci_setup_bus(struct dwmci_host *host, u32 freq)
 	do {
 		status = dwmci_readl(host, DWMCI_CMD);
 		if (timeout-- < 0) {
-			debug("%s: Timeout!\n", __func__);
 			return -ETIMEDOUT;
 		}
 	} while (status & DWMCI_CMD_START);
@@ -442,9 +401,7 @@ int dwmci_set_ios(struct mmc *mmc)
 	struct dwmci_host *host = (struct dwmci_host *)mmc->priv;  //????
 	u32 ctype, regs;
 
-	debug("Buswidth = %d, clock: %d\n", mmc->bus_width, mmc->clock);
-
-	dwmci_setup_bus(host, mmc->clock);  /* 配置SD host的工作时钟 */
+	dwmci_setup_bus(host, mmc->clock);
 	switch (mmc->bus_width) {
 	case 8:
 		ctype = DWMCI_CTYPE_8BIT;
@@ -483,7 +440,6 @@ static int dwmci_init(struct mmc *mmc)
 	dwmci_writel(host, DWMCI_PWREN, 1);
 
 	if (!dwmci_wait_reset(host, DWMCI_RESET_ALL)) {
-		debug("%s[%d] Fail-reset!!\n", __func__, __LINE__);
 		return -EIO;
 	}
 

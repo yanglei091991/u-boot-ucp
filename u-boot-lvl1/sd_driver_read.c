@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <string.h>
 #include "drv_common.h"
 #include "sd_common.h"
@@ -9,10 +8,9 @@
 //#define  UCP_SDIO_BASE       0x02050000
 #define  SDIO_BUS_WIDTH      4
 
-//#define	 DWMMC_MAX_FREQ			5000000   /* 5M */
 #define	 DWMMC_MAX_FREQ			10000000   /* 10M */
 #define	 DWMMC_MIN_FREQ			  400000   /* 400k */
-#define	 DWMMC_CLOCK			SYS_CLK   /* 50M */
+#define	 DWMMC_CLOCK			gSysClk
 
 struct mmc ucp_mmc;
 struct dwmci_host ucp_host;
@@ -21,7 +19,7 @@ struct dwmci_host ucp_host;
 static struct dw_timer *systimer_base = (struct dw_timer *)0x031d0000;
 static struct dw_timer *systimer1_base = (struct dw_timer *)0x031d0014;
 
-#define TIMER_CLK   SYS_CLK            /* 50M */
+#define TIMER_CLK   gSysClk            
 #define BASE_US    (TIMER_CLK/1000000)  /* BASE_US=1us */
 
 #define BASE_10US   25     /* timer clk=2.5M, base=10us */
@@ -59,8 +57,6 @@ u32 mmc_bread(u32 start, u32 blkcnt,void *dst)
 		
 	if (mmc_set_blocklen(mmc, mmc->read_bl_len)) 
 	{
-		//pr_debug("%s: Failed to set blocklen\n", __func__);
-		debug("%s: Failed to set blocklen\n\r", __func__);
 		return 0;
 	}
 
@@ -72,8 +68,6 @@ u32 mmc_bread(u32 start, u32 blkcnt,void *dst)
 			mmc->cfg->b_max : blocks_todo;
 		if (mmc_read_blocks(mmc, dst, start, cur) != cur) 
 		{
-			//pr_debug("%s: Failed to read blocks\n", __func__);
-			debug("%s: Failed to read blocks\n\r", __func__);
 			return 0;
 		}
 		blocks_todo -= cur;
@@ -103,7 +97,7 @@ void us_delay(unsigned int usec)
 
 /* before pll locked, clock is 2.5MHz  
   delay unit: 10us */
-void tus_delay(unsigned int tusec)
+void bpll_tus_delay(unsigned int tusec)
 {
     unsigned int value,status;
 
@@ -126,16 +120,11 @@ ulong get_timer(ulong usec)
     ulong  now,base;
 	uint   value;
 
-#if 0    
-    if(!usec)
-      return (readl(&systimer_base->timer0value)/BASE_US);
-#else
     if(!usec)
     {
        value = readl(&systimer_base->timer0value);
        return (value/BASE_US);
     }
-#endif
       
     base = (usec*BASE_US);
     now = readl(&systimer_base->timer0value);
@@ -172,15 +161,10 @@ int sd_init(void)
 	host->name = "UCP DWMMC";
     host->bus_hz = DWMMC_CLOCK;
 	host->dev_index = 0;
-#if 0
-    host->fifo_mode = 1;
-    host->fifoth_val = MSIZE(0x2) | RX_WMARK(0x100 / 2 - 1) | TX_WMARK(0x100 / 2);
-#endif
     
 	/* Add the mmc channel to be registered with mmc core */
-	if (add_dwmci(host, DWMMC_MAX_FREQ, DWMMC_MIN_FREQ)) 
+	if (add_dwmci(host, gSdioClk, DWMMC_MIN_FREQ)) 
 	{
-		debug("DWMMC registration failed\n\r");
 		return -1;
 	}    
     ucp_mmc.dsr_imp		= 0;
@@ -188,7 +172,6 @@ int sd_init(void)
     err = mmc_init(&ucp_mmc);	
 	if(err)
     {
-	  debug("%s: Failed in mmc_init(). \n\r", __func__);
       return -1;
     }
     return 0;

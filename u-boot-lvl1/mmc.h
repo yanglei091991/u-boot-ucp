@@ -8,25 +8,9 @@
 
 #ifndef _MMC_H_
 #define _MMC_H_
-#if  0
-#include <linux/list.h>
-#include <linux/sizes.h>
-#include <linux/compiler.h>
-#include <part.h>
-#else
+
 #include "sd_common.h"
-#endif
 
-
-//#if CONFIG_IS_ENABLED(MMC_HS200_SUPPORT)
-#ifdef  MMC_HS200_SUPPORT
-#define MMC_SUPPORTS_TUNING
-#endif
-
-#ifdef  MMC_UHS_SUPPORT
-//#if CONFIG_IS_ENABLED(MMC_UHS_SUPPORT)
-#define MMC_SUPPORTS_TUNING
-#endif
 
 /* SD/MMC version bits; 8 flags, 8 major, 8 minor, 8 change */
 #define SD_VERSION_SD	(1U << 31)
@@ -349,31 +333,6 @@ enum mmc_voltage {
 #define MMC_NUM_BOOT_PARTITION	2
 #define MMC_PART_RPMB           3       /* RPMB partition number */
 
-
-#if  0
-/* Driver model support */
-
-/**
- * struct mmc_uclass_priv - Holds information about a device used by the uclass
- */
-struct mmc_uclass_priv {
-	struct mmc *mmc;
-};
-
-/**
- * mmc_get_mmc_dev() - get the MMC struct pointer for a device
- *
- * Provided that the device is already probed and ready for use, this value
- * will be available.
- *
- * @dev:	Device
- * @return associated mmc struct pointer if available, else NULL
- */
-struct mmc *mmc_get_mmc_dev(struct udevice *dev);
-
-/* End of driver model support */
-#endif
-
 struct mmc_cid {
 	unsigned long psn;
 	unsigned short oid;
@@ -400,118 +359,10 @@ struct mmc_data {
 	uint blocksize;
 };
 
-/* forward decl. */
-//struct mmc;
-
-#if  0
-//#if CONFIG_IS_ENABLED(DM_MMC)
-struct dm_mmc_ops {
-	/**
-	 * send_cmd() - Send a command to the MMC device
-	 *
-	 * @dev:	Device to receive the command
-	 * @cmd:	Command to send
-	 * @data:	Additional data to send/receive
-	 * @return 0 if OK, -ve on error
-	 */
-	int (*send_cmd)(struct udevice *dev, struct mmc_cmd *cmd,
-			struct mmc_data *data);
-
-	/**
-	 * set_ios() - Set the I/O speed/width for an MMC device
-	 *
-	 * @dev:	Device to update
-	 * @return 0 if OK, -ve on error
-	 */
-	int (*set_ios)(struct udevice *dev);
-
-	/**
-	 * send_init_stream() - send the initialization stream: 74 clock cycles
-	 * This is used after power up before sending the first command
-	 *
-	 * @dev:	Device to update
-	 */
-	void (*send_init_stream)(struct udevice *dev);
-
-	/**
-	 * get_cd() - See whether a card is present
-	 *
-	 * @dev:	Device to check
-	 * @return 0 if not present, 1 if present, -ve on error
-	 */
-	int (*get_cd)(struct udevice *dev);
-
-	/**
-	 * get_wp() - See whether a card has write-protect enabled
-	 *
-	 * @dev:	Device to check
-	 * @return 0 if write-enabled, 1 if write-protected, -ve on error
-	 */
-	int (*get_wp)(struct udevice *dev);
-
-#ifdef MMC_SUPPORTS_TUNING
-	/**
-	 * execute_tuning() - Start the tuning process
-	 *
-	 * @dev:	Device to start the tuning
-	 * @opcode:	Command opcode to send
-	 * @return 0 if OK, -ve on error
-	 */
-	int (*execute_tuning)(struct udevice *dev, uint opcode);
-#endif
-
-#if CONFIG_IS_ENABLED(MMC_UHS_SUPPORT)
-	/**
-	 * wait_dat0() - wait until dat0 is in the target state
-	 *		(CLK must be running during the wait)
-	 *
-	 * @dev:	Device to check
-	 * @state:	target state
-	 * @timeout:	timeout in us
-	 * @return 0 if dat0 is in the target state, -ve on error
-	 */
-	int (*wait_dat0)(struct udevice *dev, int state, int timeout);
-#endif
-};
-
-#define mmc_get_ops(dev)        ((struct dm_mmc_ops *)(dev)->driver->ops)
-
-int dm_mmc_send_cmd(struct udevice *dev, struct mmc_cmd *cmd,
-		    struct mmc_data *data);
-int dm_mmc_set_ios(struct udevice *dev);
-void dm_mmc_send_init_stream(struct udevice *dev);
-int dm_mmc_get_cd(struct udevice *dev);
-int dm_mmc_get_wp(struct udevice *dev);
-int dm_mmc_execute_tuning(struct udevice *dev, uint opcode);
-int dm_mmc_wait_dat0(struct udevice *dev, int state, int timeout);
-
-/* Transition functions for compatibility */
-int mmc_set_ios(struct mmc *mmc);
-void mmc_send_init_stream(struct mmc *mmc);
-int mmc_getcd(struct mmc *mmc);
-int mmc_getwp(struct mmc *mmc);
-int mmc_execute_tuning(struct mmc *mmc, uint opcode);
-int mmc_wait_dat0(struct mmc *mmc, int state, int timeout);
-
-//#else
-struct mmc_ops {
-	int (*send_cmd)(struct mmc *mmc,
-			struct mmc_cmd *cmd, struct mmc_data *data);
-	int (*set_ios)(struct mmc *mmc);
-	int (*init)(struct mmc *mmc);
-	int (*getcd)(struct mmc *mmc);
-	int (*getwp)(struct mmc *mmc);
-};
-#endif
-
-
 struct mmc_config {
 	const char *name;
-#if 1	
-//#if !CONFIG_IS_ENABLED(DM_MMC)
 	const struct mmc_ops *ops;
-#endif
-	uint host_caps;  /* host能力 */
+	uint host_caps;
 	uint voltages;
 	uint f_min;
 	uint f_max;
@@ -543,23 +394,10 @@ enum bus_mode {
 };
 
 
-//const char *mmc_mode_name(enum bus_mode mode);
-//void mmc_dump_capabilities(const char *text, uint caps);
-
 static inline bool mmc_is_mode_ddr(enum bus_mode mode)
 {
 	if (mode == MMC_DDR_52)
 		return true;
-//#if CONFIG_IS_ENABLED(MMC_UHS_SUPPORT)
-#ifdef MMC_UHS_SUPPORT
-	else if (mode == UHS_DDR50)
-		return true;
-#endif
-//#if CONFIG_IS_ENABLED(MMC_HS400_SUPPORT)
-#ifdef MMC_HS400_SUPPORT
-	else if (mode == MMC_HS_400)
-		return true;
-#endif
 	else
 		return false;
 }
@@ -572,12 +410,7 @@ static inline bool mmc_is_mode_ddr(enum bus_mode mode)
 
 static inline bool supports_uhs(uint caps)
 {
-//#if CONFIG_IS_ENABLED(MMC_UHS_SUPPORT)
-#if  1  /* MMC_UHS_SUPPORT */
 	return (caps & UHS_CAPS) ? true : false;
-#else
-	return false;
-#endif
 }
 
 
@@ -589,10 +422,7 @@ static inline bool supports_uhs(uint caps)
  */
 struct mmc 
 {
-//#if !CONFIG_IS_ENABLED(BLK)
-#if 0
-	struct list_head link;
-#endif
+
 	const struct mmc_config *cfg;	/* provided configuration */
 	uint version;
 	void *priv;
@@ -600,10 +430,10 @@ struct mmc
 	int high_capacity;
 	bool clk_disable; /* true if the clock can be turned off */
 	uint bus_width;
-	uint clock;        /* SD卡的当前工作时钟 */
+	uint clock;
 	enum mmc_voltage signal_voltage;
-	uint card_caps;    /* SD卡 能力 */
-	uint host_caps;    /* host 能力 */
+	uint card_caps;
+	uint host_caps;
 	uint ocr;
 	uint dsr;
 	uint dsr_imp;   /* 是否有DSR寄存器 */

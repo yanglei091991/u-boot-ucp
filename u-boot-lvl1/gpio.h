@@ -7,8 +7,6 @@
 /**********************************************************************************************/
 
 
-#define GPIOS_PER_PORT		32
-
 #define   GPIOADDR_BASE   0x02118000   /* GPIO0 */
 #define   GPIO1_BASE      0x04a40000   /* GPIO1 */
 
@@ -60,9 +58,11 @@
 #define   GPIO_SPI_CS_PIN           GPIO_Pin_11      /* gpio[43]--CTRL_IN3  */
 #define   GPIO_SPI_HOLD_PIN      GPIO_Pin_12      /* gpio[44]--EN_AGC  */
 #define   GPIO_SPI_WP_PIN          GPIO_Pin_13     /* gpio[45]--SYNC_IN  */
-#define   GPIO_LED0_PIN               GPIO_Pin_17     /* AP_GPIOB17 */
-#define   GPIO_LED1_PIN               GPIO_Pin_20     /* AP_GPIOB20 */
-#define   GPIO_LED2_PIN               GPIO_Pin_21     /* AP_GPIOB21 */
+#define   LED0_ON               GPIO_Pin_19     /* AP_GPIOA19 */
+#define   LED1_ON               GPIO_Pin_20     /* AP_GPIOA20 */
+#define   LED2_ON               GPIO_Pin_21     /* AP_GPIOA21 */
+
+
 
 
 /* GPIO_Pin定义 */
@@ -102,12 +102,15 @@
 
 
 
+#if  0
 /* GPIO主要函数声明 */
-extern  void boot_gpio_set_value(unsigned int pin_num, unsigned char value);
+void boot_gpio_set_value(unsigned int pin_num, unsigned char value);
 void  drv_gpio_init(void);
 void  drv_led0_on(void);
 void  drv_led0_off(void);
-
+#endif
+void  led_con(unsigned int led);
+void  led_gpio_init(void);
 
 
 #endif /*GPIO_H_*/

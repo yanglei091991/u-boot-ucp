@@ -6,7 +6,7 @@
 #define A53_M3_REMAP           (*((volatile unsigned int *)(SYSCFG_BASE_ADDR + 0x00*4)))
 #define A53CORE0_VRBA          (*((volatile unsigned int *)(SYSCFG_BASE_ADDR + 0x01*4)))
 #define A53CORE1_VRBA          (*((volatile unsigned int *)(SYSCFG_BASE_ADDR + 0x02*4)))
-#define HSIO_MODE_SEL          (*((volatile unsigned int *)(SYSCFG_BASE_ADDR + 0x03*4)))
+#define SDIO_IO_REG            (*((volatile unsigned int *)(SYSCFG_BASE_ADDR + 0x03*4)))
 #define I2C_CFG                (*((volatile unsigned int *)(SYSCFG_BASE_ADDR + 0x04*4)))
 #define UART_CFG               (*((volatile unsigned int *)(SYSCFG_BASE_ADDR + 0x05*4)))
 #define TIMER_CFG              (*((volatile unsigned int *)(SYSCFG_BASE_ADDR + 0x06*4)))

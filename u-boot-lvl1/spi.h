@@ -3,17 +3,6 @@
 
 #include "drv_common.h"
 
-/* SPI接口连接的从机设备个数 */
-//#define SSI_NUM_SLAVES 1
-
-/* Tx FIFO和Rx FIFO深度 */
-//#define SSI_TX_FIFO_DEPTH	8
-//#define SSI_RX_FIFO_DEPTH	8
-/*Tx FIFO和Rx FIFO地址总线宽度 : log2(SSI_TX_FIFO_DEPTH)*/
-//#define TX_ABW	3
-//#define Rx_ABW	3
-
-
 //Tx FIFO为空
 #define Tx_FIFO_EMPTY	      (0x1<<2) 
 #define Tx_FIFO_NO_FULL	  (0x1<<1)   /* Transmit FIFO Not Full */
@@ -34,12 +23,9 @@ SPI1	  0x02100000
 SPI2	  0x04a00000
 SPI3	  0x04a10000
 */
-/* SOC use spio0, fpga test use fpga SPI2 */
-#ifdef  SOC_PRJ
+/* SOC use spio0 */
 #define SPI_BASE    0x020f8000      /* SPI0 */
-#else
-#define SPI_BASE    0x04a00000      /* SPI2 */
-#endif
+
 
 #define CTRLR0 	   (*(volatile unsigned int *)(SPI_BASE+0x00))
 #define CTRLR1 	   (*(volatile unsigned int *)(SPI_BASE+0x04))
@@ -84,13 +70,7 @@ SPI3	  0x04a10000
 #define  COL_SIZE          64
 #define  PAGE_NUM          64
 
-
-#ifdef SOC_PRJ
-    #define  SPI_CLK     1000000     /* soc clock = 1.0M */	
-#else	
-	#define  SPI_CLK     250000      /* FPGA clock= 250k */
-#endif
-#define  SPI_BAUDR  (SYS_CLK/SPI_CLK)  
+#define  SPI_BAUDR  (gSysClk/gSpiClk)  
 
 /***********************   SPI 函数声明     ***********************/
 

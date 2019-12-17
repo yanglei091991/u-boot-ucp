@@ -7,7 +7,7 @@ OBJDUMP = arm-eabi-objdump
 
 CFLAGS 	  := -g -march=armv8-a -mtune=cortex-a53  -DGCC -falign-functions=16 -fno-common -falign-jumps=8 -falign-loops=8 -fomit-frame-pointer -funroll-loops -Os
 CFLAGS    += -DUART
-#CFLAGS    += -DSOC_PRJ
+#CFLAGS    += -DSOC_PLL_CFG -DSOC_CLK_CFG
 ASFLAGS   := -g -march=armv8-a
 LDFLAGS   := 
 

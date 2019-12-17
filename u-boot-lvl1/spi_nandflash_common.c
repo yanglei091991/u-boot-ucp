@@ -33,9 +33,19 @@ bool copy_boot2_to_ram(unsigned int *src, unsigned char *dest)
   {
     return false;
   }
+
+  if(nand_head.byte_size >= 0x100000)
+  {
+#ifdef  UART
+        Uart_Printf("u-boot.bin file more than 1M! \n\r");
+#endif
+        return false;
+  }
+
   unsigned char *tmp_dest = dest;
   unsigned int srcAddr;
-  for(int i = 0; i < nand_head.byte_size/Block_Size; i++)
+  int i;
+  for(i = 0; i < nand_head.byte_size/Block_Size; i++)
   {
     srcAddr = (unsigned int)(*(pNandHead + i));
     rowAddr = (unsigned int)srcAddr << 6;

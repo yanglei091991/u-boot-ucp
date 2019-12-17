@@ -6,7 +6,6 @@
 
 #include <stdbool.h>
 
-#define  MMC_CARD_DETECT
 #define  CONFIG_MMC_QUIRKS
 
 typedef unsigned char		uchar;
@@ -93,6 +92,6 @@ void timer_init(void);
 int sd_init(void);
 int  sd_fs_read(void); // sd driver file system read
 void us_delay(unsigned int usec);
-void tus_delay(unsigned int tusec);
+void bpll_tus_delay(unsigned int tusec);
 #endif //SD_COMMON_H_
 

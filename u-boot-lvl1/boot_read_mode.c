@@ -46,20 +46,21 @@ unsigned char  read_uboot_mode(void)
     if(boot_cfg&BOOT_CTL_SYNC4)
     { /* uboot from SPI0 nand flash */
     
-#ifdef  SOC_PRJ 
-      /* SOC use spio0, spi0 must be pinmux init;fpga test use fpga SPI2 */
+      /* SOC use spio0, spi0 must be pinmux init; */
       spi0_pin_init();
-#else
-      /* spi2_ssn used for gpio--output  */
-      spi2_ssn_gpio_init();
-#endif      
-      
+          
 #ifdef  UART   
       Uart_Printf("BOOT2 from SPI nand! \n\r");
 #endif    
 
       /* init spi, read uboot from spi flash */
-      spi_nand_flash_init();
+      if(spi_nand_flash_init())
+      {
+#ifdef  UART   
+        Uart_Printf("SPI flash id error! \n\r");
+#endif        
+        return false;          
+      }
       
       /* check boot success or not */
 	  if(copy_boot2_to_ram(src,dest) == false)
@@ -75,11 +76,7 @@ unsigned char  read_uboot_mode(void)
 #endif 	  
     }
     else
-    { /* uboot from SDIO */
-
-#ifdef  MMC_CARD_DETECT    
-     sd_detect_pin_init();
-#endif     
+    { /* uboot from SDIO */  
     
 #ifdef  UART
         Uart_Printf("BOOT2 from SD card! \n\r");

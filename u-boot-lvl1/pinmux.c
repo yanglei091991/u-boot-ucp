@@ -3,6 +3,7 @@
 
 #include  "pinmux.h"
 #include  "gpio.h"
+#include  "boot_read_mode.h"
 
 #if  0
 void  test_pin_init(void)
@@ -42,11 +43,6 @@ void  spi2_holdwp_gpio_pin_init(void)
 }
 #endif
 
-static void spi_cs_delay(volatile unsigned int num)
-{
-	while(num--);
-}
-
 /*
 pad69	SPI0_SSN -- not used
 pad70	SPI0_CLK
@@ -70,9 +66,9 @@ void  spi0_pin_init(void)
 /* pad73   AP_GPIOB20 as spi0_cs */
 void  spi0_ssn_gpio_set_value(unsigned char high)
 {
-     unsigned char  value;
+     unsigned int  value;
 
-     spi_cs_delay(SPI_CS_DELAY);
+     //spi_cs_delay(SPI_CS_DELAY);
      
      value = gpio_swportb_dr;
      if(high)
@@ -93,7 +89,29 @@ void  sd_detect_pin_init(void)
    val = PINMUX_198 & (~0x00F00000);
    val |= 0x00500000;   
    PINMUX_198 = val;  
+
+  PAD41_CTRL |= (BIT6|BIT7);
+  PAD42_CTRL |= (BIT6|BIT7);
+  SDIO_IO_REG = 0;
+  
 }
+
+/* AP_GPIOA19(4):LED0   Pad36 */
+/* AP_GPIOA20(4):LED1   Pad37 */
+/* AP_GPIOA21(4):LED2   Pad38 */
+void  led_gpio_pin_init(void)
+{
+    unsigned int val,src,mask;
+
+	mask = ~(BIT10|BIT11|BIT12|BIT13|BIT14|BIT15);
+	
+    val = AP_GPIOA19|AP_GPIOA20|AP_GPIOA21;
+    src = PINMUX_198 & mask; 
+    PINMUX_198 = (val|src);
+
+	led_gpio_init();
+}
+
 
 
 /*
@@ -112,23 +130,6 @@ void  spi2_pin_init(void)
     PINMUX_194 = (val|src);
 }
 
-
-/* Pad66-- LED0   AP_GPIOB17 */
-/* Pad73-- LED1   AP_GPIOB20 */
-/* Pad74-- LED2   AP_GPIOB21 */
-void  LED_gpio_pin_init(void)
-{
-    unsigned int val,src;
-#if  0    
-    val = AP_GPIOB17|AP_GPIOB20|AP_GPIOB21;
-    src = PINMUX_1A0 & 0xF0FFF3FF;    
-#else
-    val = AP_GPIOB19;
-    src = PINMUX_1A0 & 0xFFFF3FFF; 
-#endif
-    PINMUX_1A0 = (val|src);      
-}
-
 void  pinmux_init(void)
 {
 
@@ -136,7 +137,7 @@ void  pinmux_init(void)
     spi2_ssn_gpio_init();
 }
 
-#endif
+
 
 /* config SPI2_SSN in GPIO's output */
 /* pad61	SPI2_SSN pin --AP_GPIOB12 */
@@ -158,7 +159,7 @@ void  spi2_ssn_gpio_init(void)
 /* pad61	SPI2_SSN pin --AP_GPIOB12 */
 void  spi2_ssn_gpio_set_value(unsigned char high)
 {
-     unsigned char  value;
+     unsigned int  value;
 
      spi_cs_delay(SPI_CS_DELAY);
      
@@ -170,6 +171,7 @@ void  spi2_ssn_gpio_set_value(unsigned char high)
      gpio_swportb_dr = value;
 }
 
+#endif
 
 
 

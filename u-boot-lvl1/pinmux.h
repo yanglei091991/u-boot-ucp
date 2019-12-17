@@ -3,7 +3,8 @@
 #define PINMUX_H
 
 
-#define   PINMUX_BASE      0x020d8000
+#define   PINMUX_BASE      0x020e0000
+
 
 #define   PINMUX_190      (*(volatile unsigned int *)(PINMUX_BASE+0x190))   
 #define   PINMUX_194      (*(volatile unsigned int *)(PINMUX_BASE+0x194))   /*(Pad30- Pad17)*/
@@ -11,6 +12,8 @@
 #define   PINMUX_19C      (*(volatile unsigned int *)(PINMUX_BASE+0x19c))
 #define   PINMUX_1A0      (*(volatile unsigned int *)(PINMUX_BASE+0x1a0))
 
+#define PAD41_CTRL        (*((volatile unsigned int *)(PINMUX_BASE + 0x29*4)))
+#define PAD42_CTRL        (*((volatile unsigned int *)(PINMUX_BASE + 0x2a*4)))
 
 /* 偏移地址：0x194(Pad30-Pad17) */
 /* SPI2--  第二功能 */
@@ -43,23 +46,25 @@
 #define   AP_GPIOA26   (0x3<<24)    /* Pad43 */
 #define   AP_GPIOA27   (0x3<<26)    /* Pad44 */
 #define   AP_GPIOA28   (0x3<<28)    /* Pad45 */
+#define   AP_GPIOA19   (0x3<<10)    /* Pad36 */
+#define   AP_GPIOA20   (0x3<<12)    /* Pad37 */
+#define   AP_GPIOA21   (0x3<<14)    /* Pad38 */
+
+
 
 #define   SPI2_SSN_GPIO    (0x3)   /* pad61	SPI2_SSN_GPIO */
 
 #define   SPI_CS_DELAY   40
 
-/****************************************/
-/* CRG--- */
-/****************************************/
-#define   CRG_BASE     0x03670000
-#define   DDR_ENABLE   0x60
 
 void  spi0_pin_init(void);
 void  spi0_ssn_gpio_set_value(unsigned char high);
 //void  pinmux_init(void);
-void  spi2_ssn_gpio_init(void);
-void  spi2_ssn_gpio_set_value(unsigned char high);
+//void  spi2_ssn_gpio_init(void);
+//void  spi2_ssn_gpio_set_value(unsigned char high);
 void  sd_detect_pin_init(void);
+void  led_gpio_pin_init(void);
+
 #endif
 
 

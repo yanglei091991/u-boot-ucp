@@ -42,9 +42,11 @@ bootcode:
                 .equ MODE_SYS                , 0x1f
 
 
-                ldr     r0, = BOOT1_STACK_TOP  // stack_top imported from space allocated in stackheap.S
+                ldr     r0, =CORE0_STACK_TOP  // stack_top 0x020def00 define in boot_defs.hs
                 mrc     p15, 0, r1, c0, c0, 5
                 and     r1, r1, #0xff          // r1 = CPU number
+                cmp     r1, #1
+                bleq    get_core1_stack_top 
                 mov     r2, #(CPU_STACK_SIZE)
                 mul     r1, r1, r2             // CPU_STACK_SIZE x cpu number
 
@@ -95,25 +97,16 @@ bootcode:
                 beq     cpu1_jump
 
                 // CRG reg init, wakeup cpu1
-                ldr     r0, =DEV_ENA_REG2_ADDR 
+                ldr     r0, =DEV_ENA_REG2_ADDR // 0x03670060 
                 ldr     r1, [r0]
-                mov     r2, #0xe07      // cpu1 wakeup reg config
+                ldr     r2, =2      // cpu1 wakeup reg config
                 orr     r1, r1, r2
                 str     r1, [r0]
                 ldr     r0, =0xFFFFFFFF
                 ldr     r1, =DEV_ENA_REG1_ADDR // 0x0367005c
                 str     r0, [r1]
                
-                 // cpu1 wakeup start
-//                ldr r1, =DEV_ENA_REG2_ADDR // 0x03670060
-//                ldr r1, [r1]
-//                mov r2, #2
-//                orr r1, r1, r2
-//                ldr r3, =DEV_ENA_REG2_ADDR
-//                str r1, [r3]
-                // cpu1 wakeup end
                 b     cpu_start
-
 
 /**********************************************/
 // cpu1 wfe
@@ -121,7 +114,7 @@ wfe_lable:
                 wfe
                 wfe
 cpu1_jump:
-                ldr r1, =CPU1_SYS_CTRL
+                ldr r1, =CPU1_SYS_CTRL // 0x03690058
                 ldr r0, [r1]
                 cmp r0, #0
                 beq  wfe_lable
@@ -131,19 +124,19 @@ cpu1_jump:
 cpu_start:
                 // clear share mem 0-5
                 mov r2, #0
-                ldr r0, =SM5_START_ADDR // 128KB
-				ldr r1, =SM5_END_ADDR
+                ldr r0, =SM5_START_ADDR // 128KB 0x020c0000
+				ldr r1, =SM5_END_ADDR   // 0x020e0000
                 bl copy_loop
-                ldr r0, =SM4_START_ADDR // 64KB
-				ldr r1, =SM4_END_ADDR
+                ldr r0, =SM4_START_ADDR // 64KB 0x047d0000
+				ldr r1, =SM4_END_ADDR   // 0x047e0000
                 bl copy_loop
-                ldr r0, =SM03_START_ADDR // 1M
-				ldr r1, =SM03_END_ADDR
+                ldr r0, =SM03_START_ADDR // 1M 0x04e60000
+				ldr r1, =SM03_END_ADDR   // 0x04f60000
                 bl copy_loop
                 // call c  main
                 bl _arm_start
 start_boot2:
-                ldr r0, =BOOT2_START_ADDR /*boot2 entry point*/
+                ldr r0, =BOOT2_START_ADDR /*boot2 entry point 0x04e60000*/
                 mov lr, r0
                 mov pc, lr          /* jump to boot2 */
  
@@ -153,6 +146,11 @@ copy_loop:
 				cmp r0, r1
 				bne copy_loop
                 bx lr
+
+get_core1_stack_top:
+                ldr  r0, = CORE1_STACK_TOP  // stack_top 0x020dff00 define in boot_defs.hs
+                sub  r1, r1, r1
+                bx lr                
 
 				.end
 				

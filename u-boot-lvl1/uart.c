@@ -13,7 +13,7 @@ struct mapu_uart *uart0_addr =(struct mapu_uart *)UART_BASE_0;
 /* 串口初始化 */
 void   boot_uart_init(void)
 {
-  int baud_divisor=UART0_CLK/16/UART0_BAUDRATE;
+  int baud_divisor=UART0_CLK/16/gUART0_BAUDRATE;
   
 	(uart0_addr->reg1).ier = 0x0; //Interrupt Enable Register
   uart0_addr->lcr = UART_LCR_BKSE | UART_LCRVAL;
@@ -31,7 +31,7 @@ void   boot_uart_init(void)
 }
 
 /* 串口输出一个8bit字符 */
-void sendchar(unsigned char *ch)
+void sendchar(char *ch)
 {
 	unsigned int send_ch;
 	
@@ -59,10 +59,10 @@ unsigned char receive_char(void)
 /* 串口输出一个字符串
   Uart_Printf("UART init success\n\r");
 */
-void Uart_Printf(unsigned char *string)
+void Uart_Printf(char *ch)
 {
-	unsigned char *buf;
-	buf =string;
+	char *buf;
+	buf = ch;
 	do{
 		sendchar(buf);
 		buf++;

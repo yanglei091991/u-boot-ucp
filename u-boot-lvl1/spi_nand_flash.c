@@ -16,19 +16,16 @@
 //#define NAND_SPI_ER_STATUS_OIP          (1 << 0)		//设备忙碌标记
 
 #define    FIFO_LEN    16
- //
-//unsigned int gNandFlashType = GD5F2GQ4RB;  
-unsigned int  gNandFlashType;
-unsigned char  gFlashSize;
+
 unsigned char  gRxDat[2048+128];
 
-#if 0
-void drv_delay(volatile unsigned int num)
+
+void spi_cs_delay(volatile unsigned int num)
 {
 
 	while(num--);
 }
-#endif
+
 
 void  Rx_FIFO_empty(void)
 {
@@ -55,18 +52,13 @@ unsigned char rt_spi_send_then_recv(unsigned char *send_buf,
 
     total = rx_len+tx_len;
     pRxdat = gRxDat;
-
-#ifdef  SOC_PRJ 
-      /* SOC use spio0, spi0_cs =0  */
-     spi0_ssn_gpio_set_value(0); 
-#else
-    /* fpga test use fpga SPI2, spi2_cs =0 */
-    spi2_ssn_gpio_set_value(0);
-#endif
     
     while( Tx_FIFO_EMPTY != (SR & Tx_FIFO_EMPTY));
     Rx_FIFO_empty();  /* 接收FIFO读空 */
-    
+
+      /* SOC use spio0, spi0_cs =0  */
+     spi0_ssn_gpio_set_value(0); 
+
     while((tByte<total)||(rByte<total))
     {
            while (( Tx_FIFO_NO_FULL == (SR & Tx_FIFO_NO_FULL))&&(tByte< total))
@@ -89,14 +81,11 @@ unsigned char rt_spi_send_then_recv(unsigned char *send_buf,
 
       }
 
-#ifdef  SOC_PRJ 
-      /* SOC use spio0, spi0_cs =1  */
-     spi0_ssn_gpio_set_value(1); 
-#else
-    /* fpga test use fpga SPI2, spi2_cs =1 */
-    spi2_ssn_gpio_set_value(1);
-#endif
-
+    while( Tx_FIFO_EMPTY != (SR & Tx_FIFO_EMPTY));
+    spi_cs_delay(50);
+	/* SOC use spio0, spi0_cs =1	*/
+	spi0_ssn_gpio_set_value(1); 
+	
 #if  0
 	if(rx_len)
 	   memcpy(recv_buf, &gRxDat[tx_len], rx_len);
@@ -373,33 +362,18 @@ void nandflash_reset(void)
 
 int spi_nand_flash_init(void)
 {
-	   unsigned char rxbuf[4];
+	unsigned char rxbuf[4];
+    unsigned int  NandFlashType;
 
-       /* SOC use spio0, fpga test use SPI2 */
-	   spi_init();	   
-	   us_delay(100);
-	   nandflash_reset();
-	   nandflash_readid(rxbuf);                   //读出NAND FLASH ID号
-	   gNandFlashType=(rxbuf[0]<<8)+rxbuf[1];
-
-	   switch   (gNandFlashType)
-	   	{
-           case   GD5F2GQ4RB:
-                     gFlashSize = FLASH_2G_BIT;
-                     break;
-                     
-           case   GD5F1GQ4RB:
-                     gFlashSize = FLASH_1G_BIT;
-                     break;                     
-
-           default:  
-           	           //print error
-           	          break;
-
-	   }
-
-	   //nandflash_unlock(0);		//解除锁定
-
+    /* SOC use spio0, fpga test use SPI2 */
+	spi_init();	   
+	us_delay(100);
+	nandflash_reset();
+	nandflash_readid(rxbuf);                   //读出NAND FLASH ID号
+	NandFlashType=(rxbuf[0]<<8)+rxbuf[1];
+    if((NandFlashType&0x0000FF00)!=0xC800)
+       return 1;
+      
 	return 0;
 }
 

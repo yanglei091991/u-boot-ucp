@@ -24,14 +24,9 @@
 //   Library re-target file for C-based test code
 //------------------------------------------------------------------------------
 
-#include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include <errno.h>
-#include <sys/time.h>
-#include <sys/times.h>
-#include <sys/stat.h>
 #include <unistd.h>
 
 extern char __bss_start__[], __bss_end__[];

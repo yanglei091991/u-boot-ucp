@@ -1,12 +1,7 @@
 #ifndef SPI_NANDFLASH_COMMON_H
 #define SPI_NANDFLASH_COMMON_H
 
-#include <stdio.h>
 #include <stdint.h>
-#include <stdlib.h>
-#include <string.h>
-#include <errno.h>
-#include <unistd.h>
 #include <stdbool.h>
 #include "spi_nand_flash.h"
 #include "crc32.h"

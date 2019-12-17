@@ -7,9 +7,10 @@
 #define UART_BASE_1      0x02110000      /* UART 1 */
 
 
-#define UART0_CLK            SYS_CLK
-#define UART0_BAUDRATE    115200
-//#define UART0_BAUDRATE    19200
+#define UART0_CLK         gSysClk
+//#define UART0_BAUDRATE    115200
+#define UART0_BAUDRATE    19200
+
 
 
 
@@ -174,7 +175,7 @@ struct mapu_uart {
 #define UART_IER_ERBFI UART_IER_RDI
 
 void   boot_uart_init(void);
-void Uart_Printf(unsigned char *string);
+void Uart_Printf(char *ch);
 
 #endif
 

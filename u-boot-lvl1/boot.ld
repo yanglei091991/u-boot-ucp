@@ -53,32 +53,7 @@ SECTIONS
   . = ALIGN(4);
    __data_end = .;
   } 
- /* 
-  .rel.dyn : 
-  {
-   __rel_dyn_start = .;
-  . = ALIGN(4);
-   *(.rel*)
-  . = ALIGN(4);
-   __rel_dyn_end = .;
-  } 
 
-  .rel.plt : 
-  {
-   __rel_plt_start = .;
-  . = ALIGN(4);
-   *(.rel.plt*)
-  . = ALIGN(4);
-   __rel_plt_end = .;
-  } 
-
-  .dynsym : 
-  {
-    __dynsym_start = .;
-    . = ALIGN(4);
-    *(.dynsym)
-  }
-*/
   /* Notes section
    * This is not used so we discard it. Although not used it needs to be
    * explicitly mentioned in the linker script as some toolchains will place
