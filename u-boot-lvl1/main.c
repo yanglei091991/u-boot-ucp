@@ -12,21 +12,21 @@
 
 #ifdef SOC_CLK_CFG
    /* soc config clk */
-   unsigned int gSysClk = 100000000;     /* 100MHz */;
+   unsigned int gSysClk = 100000000;     /* 100MHz */
    unsigned int gUART0_BAUDRATE = 115200;
-   unsigned int gSpiClk = 250000;
-   unsigned int gSdioClk = 10000000;     /* 10MHz */;
+   unsigned int gSpiClk = 1000000;       /* 1MHz */
+   unsigned int gSdioClk = 10000000;     /* 10MHz */
 #else
 #if 0 
    unsigned int gSysClk = 50000000;      /* 50MHz */
    unsigned int gUART0_BAUDRATE =115200;
    unsigned int gSpiClk = 250000;
-   unsigned int gSdioClk = 10000000;     /* 10MHz, actually 50/6=8.33M */;
+   unsigned int gSdioClk = 10000000;     /* 10MHz, actually 50/6=8.33M */
 #else
    unsigned int gSysClk = 10000000;     /* 10MHz */
    unsigned int gUART0_BAUDRATE =19200;
    unsigned int gSpiClk = 100000;
-   unsigned int gSdioClk = 2500000;    /* 2.5MHz */;
+   unsigned int gSdioClk = 2500000;    /* 2.5MHz */
 #endif
 #endif
 
@@ -37,7 +37,7 @@ void copy_data_to_ram(unsigned char *src,
 }
 
 /* used XTAL(20MHz/2=10MHz) as A53/UART/SPI/SDIO/timer clcok */
-void  clk_in_xtal(void)
+void  xtal_clk_cfg(void)
 {
     APHCLK_CTRL     = (1 << 13)+1;
     CPHCLK_CTRL     = (1 << 13)+1;
@@ -112,7 +112,7 @@ int main()
 // config pll clock
 #ifdef  SOC_PLL_CFG
    if(config_pll()==false)
-      clk_in_xtal();
+      xtal_clk_cfg();
 #endif
 
   // copy data segment from rom to share mem 5
