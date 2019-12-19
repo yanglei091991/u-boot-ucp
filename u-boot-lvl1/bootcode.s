@@ -112,7 +112,6 @@ bootcode:
 // cpu1 wfe
 wfe_lable:
                 wfe
-                wfe
 cpu1_jump:
                 ldr r1, =CPU1_SYS_CTRL // 0x03690058
                 ldr r0, [r1]

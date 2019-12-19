@@ -1,4 +1,4 @@
-ENTRY(bootcode)
+ENTRY(vector_table)
 
 RAM_DATA_BASE = 0x020c0000;
 SECTIONS
@@ -9,8 +9,8 @@ SECTIONS
   /* Code starts with vectors, then bootcode, then other code */
   .text :
   {
-    *bootcode.o(boot)
     *vectors.o(vectors)
+    *bootcode.o(boot)
     *(.text*) /* remainder of code */
   } 
 

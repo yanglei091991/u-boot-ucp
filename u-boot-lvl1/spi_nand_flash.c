@@ -372,8 +372,8 @@ int spi_nand_flash_init(void)
 	nandflash_readid(rxbuf);                   //¶Á³öNAND FLASH IDºÅ
 	NandFlashType=(rxbuf[0]<<8)+rxbuf[1];
     if((NandFlashType&0x0000FF00)!=0xC800)
-       return 1;
+       return false;
       
-	return 0;
+	return true;
 }
 

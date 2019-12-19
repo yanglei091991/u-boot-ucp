@@ -13,7 +13,7 @@ bool copy_boot2_to_ram(unsigned int *src, unsigned char *dest)
   if(nandflash_read_arr[read_arr_index](rowAddr, colAddr, SM5_Addr, sizeof(SM5_Addr)) != 0)
   {
 #ifdef UART
-      Uart_Printf("spi read head nand error! \n\r");
+      Uart_Printf("error: spi read u-boot header from nandflash fail! \n\r");
 #endif 
       return false;
   }
@@ -31,13 +31,16 @@ bool copy_boot2_to_ram(unsigned int *src, unsigned char *dest)
 
   if(nand_head.op_type != boot2)
   {
+#ifdef UART
+      Uart_Printf("error: spi read header file not u-boot from nandflash! \n\r");
+#endif 
     return false;
   }
 
   if(nand_head.byte_size >= 0x100000)
   {
 #ifdef  UART
-        Uart_Printf("u-boot.bin file more than 1M! \n\r");
+        Uart_Printf("error: u-boot.bin file more than 1M! \n\r");
 #endif
         return false;
   }
@@ -53,7 +56,7 @@ bool copy_boot2_to_ram(unsigned int *src, unsigned char *dest)
     if(nandflash_read_arr[read_arr_index](rowAddr, colAddr, tmp_dest, Block_Size) != 0)
     {
 #ifdef UART
-        Uart_Printf("spi read block nand error! \n\r");
+        Uart_Printf("error: spi read a block of u-boot from nandflash fail! \n\r");
 #endif
         return false;
     }
@@ -68,7 +71,7 @@ bool copy_boot2_to_ram(unsigned int *src, unsigned char *dest)
     if(nandflash_read_arr[read_arr_index](rowAddr, colAddr, tmp_dest, nand_head.byte_size%Block_Size) != 0)
     {
 #ifdef UART    
-        Uart_Printf("spi read remainder block nand error! \n\r");
+        Uart_Printf("error: spi read remainder block of u-boot from nandflash fail! \n\r");
 #endif
         return false;
     }
@@ -76,7 +79,11 @@ bool copy_boot2_to_ram(unsigned int *src, unsigned char *dest)
 
   unsigned int dest_file_crc = crc32(dest, nand_head.byte_size);
   if(nand_head.crc != dest_file_crc)
+  {
+#ifdef UART    
+        Uart_Printf("error: spi read u-boot from nandflash crc32 fail! \n\r");
+#endif
     return false;
-  
+  }
   return true;
 }

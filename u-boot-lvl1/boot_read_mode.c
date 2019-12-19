@@ -50,11 +50,11 @@ unsigned char  read_uboot_mode(void)
       spi0_pin_init();
           
 #ifdef  UART   
-      Uart_Printf("BOOT2 from SPI nand! \n\r");
+      Uart_Printf("U-BOOT from SPI nand! \n\r");
 #endif    
 
-      /* init spi, read uboot from spi flash */
-      if(spi_nand_flash_init())
+      /* init spi and read spi flash id */
+      if(spi_nand_flash_init() == false)
       {
 #ifdef  UART   
         Uart_Printf("SPI flash id error! \n\r");
@@ -62,35 +62,35 @@ unsigned char  read_uboot_mode(void)
         return false;          
       }
       
-      /* check boot success or not */
+      /* read uboot from spi flash */
 	  if(copy_boot2_to_ram(src,dest) == false)
       {
 #ifdef  UART   
-          Uart_Printf("BOOT1 copy BOOT2 from SPI flash Failed! \n\r");
+          Uart_Printf("BOOT1 copy U-BOOT from SPI flash Failed! \n\r");
 #endif        
         return false;  
       }
 
 #ifdef  UART   
-          Uart_Printf("BOOT1 copy BOOT2 from SPI flash ok! \n\r");
+          Uart_Printf("BOOT1 copy U-BOOT from SPI flash ok! \n\r");
 #endif 	  
     }
     else
     { /* uboot from SDIO */  
     
 #ifdef  UART
-        Uart_Printf("BOOT2 from SD card! \n\r");
+        Uart_Printf("U-BOOT from SD card! \n\r");
 #endif
         /* init sdio, read uboot from sd card */     
        if(sd_fs_read() == false)
        { 
 #ifdef  UART   
-          Uart_Printf("BOOT1 copy BOOT2 from SD Failed! \n\r");
+          Uart_Printf("BOOT1 copy U-BOOT from SD Failed! \n\r");
 #endif        
         return false;  
        }
 #ifdef  UART   
-          Uart_Printf("BOOT1 copy BOOT2 from SD ok! \n\r");
+          Uart_Printf("BOOT1 copy U-BOOT from SD ok! \n\r");
 #endif 	  
       
     }

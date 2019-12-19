@@ -17,7 +17,7 @@
    unsigned int gSpiClk = 1000000;       /* 1MHz */
    unsigned int gSdioClk = 10000000;     /* 10MHz */
 #else
-#if 0 
+#if 1 
    unsigned int gSysClk = 50000000;      /* 50MHz */
    unsigned int gUART0_BAUDRATE =115200;
    unsigned int gSpiClk = 250000;
@@ -108,13 +108,6 @@ unsigned int config_pll(void)
 
 int main()
 { 
-  
-// config pll clock
-#ifdef  SOC_PLL_CFG
-   if(config_pll()==false)
-      xtal_clk_cfg();
-#endif
-
   // copy data segment from rom to share mem 5
   extern unsigned char data_load_start[];
   extern unsigned char __data_start[];
@@ -125,7 +118,18 @@ int main()
                      __data_start,
                     (unsigned int)data_size);
   }
-  
+
+// config pll clock
+#ifdef  SOC_PLL_CFG
+   if(config_pll()==false)
+      xtal_clk_cfg();
+#endif
+
+// Zero the BSS
+extern char __bss_start__[], __bss_end__[];
+size_t bss_size = __bss_end__ - __bss_start__;
+memset(__bss_start__, 0, bss_size); 
+
 #ifdef  UART
   boot_uart_init();
 #endif  

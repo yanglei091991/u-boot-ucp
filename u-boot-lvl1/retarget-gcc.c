@@ -29,7 +29,7 @@
 #include <string.h>
 #include <unistd.h>
 
-extern char __bss_start__[], __bss_end__[];
+//extern char __bss_start__[], __bss_end__[];
 extern void __libc_init_array(void);
 extern void __libc_fini_array(void);
 
@@ -66,8 +66,8 @@ void _exit(int c)
 void init_libc(void)
 {
     // Zero the BSS
-    size_t bss_size = __bss_end__ - __bss_start__;
-    memset(__bss_start__, 0, bss_size);
+//    size_t bss_size = __bss_end__ - __bss_start__;
+//    memset(__bss_start__, 0, bss_size);
     /* atexit(__libc_fini_array);*/
     __libc_init_array();
 }

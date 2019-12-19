@@ -164,23 +164,20 @@ int sd_init(void)
     
 	/* Add the mmc channel to be registered with mmc core */
 	if (add_dwmci(host, gSdioClk, DWMMC_MIN_FREQ)) 
-	{
-		return -1;
-	}    
+		return false;
     ucp_mmc.dsr_imp		= 0;
     ucp_mmc.dsr			= 0xffffffff;
     err = mmc_init(&ucp_mmc);	
 	if(err)
-    {
-      return -1;
-    }
-    return 0;
+      return false;
+
+    return true;
 }
 
 int  sd_fs_read(void) // sd driver file system read
 {
    timer_init();
-   if(sd_init() != 0) return false;
+   if(sd_init() == false) return false;
 
    int loadfile(void *addr);
    if(loadfile((void*)0x04e60000) == false) return false;
