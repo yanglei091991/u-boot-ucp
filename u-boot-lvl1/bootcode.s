@@ -36,7 +36,9 @@ bootcode:
                 .equ I_BIT                   , 0x80
                 .equ F_BIT                   , 0x40
                 // Values for different modes in cpsr register
+                .equ MODE_FIQ                , 0x11
                 .equ MODE_IRQ                , 0x12
+                .equ MODE_SVC                , 0x13
                 .equ MODE_ABT                , 0x17
                 .equ MODE_UND                , 0x1b
                 .equ MODE_SYS                , 0x1f
@@ -64,6 +66,9 @@ bootcode:
 
 //               Enter each mode in turn and initialise stack pointer
 //               CPSR_c used to avoid altering condition codes
+                msr CPSR_c, #MODE_FIQ|I_BIT|F_BIT
+                mov     r13, r0
+                sub     r0, r0, #EXCEPTION_STACK_SIZE
                 msr CPSR_c, #MODE_IRQ|I_BIT|F_BIT
                 mov     r13, r0
                 sub     r0, r0, #EXCEPTION_STACK_SIZE
@@ -74,6 +79,9 @@ bootcode:
                 mov     r13, r0
                 sub     r0, r0, #EXCEPTION_STACK_SIZE
                 msr CPSR_c, #MODE_SYS|I_BIT|F_BIT
+                mov     r13, r0
+                sub     r0, r0, #EXCEPTION_STACK_SIZE
+                msr CPSR_c, #MODE_SVC|I_BIT|F_BIT
                 mov     r13, r0
 
 // -----------------------------------------------------------------------------

@@ -17,7 +17,7 @@
    unsigned int gSpiClk = 1000000;       /* 1MHz */
    unsigned int gSdioClk = 10000000;     /* 10MHz */
 #else
-#if 1 
+#if SYS_CLK_50M 
    unsigned int gSysClk = 50000000;      /* 50MHz */
    unsigned int gUART0_BAUDRATE =115200;
    unsigned int gSpiClk = 250000;
@@ -59,7 +59,7 @@ void  xtal_clk_cfg(void)
     SSI2CLK_CTRL    = (1 << 13)+1;
     SSI3CLK_CTRL    = (1 << 13)+1;
  
-    SDIOCLK_CTRL = 1 + (1 << 13) + BIT18; /* 10MHz */
+    SDIOCLK_CTRL = 1 + (1 << 13); /* 10MHz */
     gSysClk =10000000;       /* 10MHz */
 	gUART0_BAUDRATE =19200;
 	gSpiClk = 100000;        /* 100K */
@@ -124,11 +124,6 @@ int main()
    if(config_pll()==false)
       xtal_clk_cfg();
 #endif
-
-// Zero the BSS
-extern char __bss_start__[], __bss_end__[];
-size_t bss_size = __bss_end__ - __bss_start__;
-memset(__bss_start__, 0, bss_size); 
 
 #ifdef  UART
   boot_uart_init();
