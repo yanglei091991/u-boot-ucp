@@ -72,7 +72,8 @@ void  xtal_clk_cfg(void)
 unsigned int config_pll(void)
 {
     unsigned int count=0;
-    
+
+    SRIOCLK_CTRL |= (1<<13);    
     // config pll clock_t
     PLL1_CONFIG0 = (3 << 12) + (1 << 15) + 120;  /* 800MHz */
     PLL3_CONFIG0 = (3 << 12) + (1 << 15) + 150;  /* 1000MHz */
