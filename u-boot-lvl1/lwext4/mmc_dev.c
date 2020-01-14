@@ -37,6 +37,7 @@ uint32_t mmc_bread(uint32_t start, uint32_t blkcnt,void *dst);
 
 /**********************BLOCKDEV INTERFACE**************************************/
 static int mmc_dev_open(struct ext4_blockdev *bdev);
+static int mmc_part_dev_open(struct ext4_blockdev *bdev);
 static int mmc_dev_bread(struct ext4_blockdev *bdev, void *buf, uint64_t blk_id,
 			 uint32_t blk_cnt);
 static int mmc_dev_bwrite(struct ext4_blockdev *bdev, const void *buf,
@@ -45,6 +46,9 @@ static int mmc_dev_close(struct ext4_blockdev *bdev);
 
 /******************************************************************************/
 EXT4_BLOCKDEV_STATIC_INSTANCE(mmc_dev, 512 /* block size */, 0, mmc_dev_open,
+		mmc_dev_bread, mmc_dev_bwrite, mmc_dev_close, 0, 0);
+
+EXT4_BLOCKDEV_STATIC_INSTANCE(mmc_part_dev, 512, 0, mmc_part_dev_open,
 		mmc_dev_bread, mmc_dev_bwrite, mmc_dev_close, 0, 0);
 
 /******************************************************************************/
@@ -60,6 +64,10 @@ static int mmc_dev_open(struct ext4_blockdev *bdev)
 	return EOK;
 }
 
+static int mmc_part_dev_open(struct ext4_blockdev *bdev)
+{
+	return EOK;
+}
 /******************************************************************************/
 
 static int mmc_dev_bread(struct ext4_blockdev *bdev, void *buf, uint64_t blk_id,
@@ -87,5 +95,18 @@ static int mmc_dev_close(struct ext4_blockdev *bdev)
 struct ext4_blockdev *mmc_dev_get(void)
 {
 	return &mmc_dev;
+}
+
+struct ext4_blockdev *mmc_part_dev_get(void)
+{
+	return &mmc_part_dev;
+}
+
+void mmc_part_dev_setpart(uint32_t start, uint32_t count)
+{
+	mmc_part_dev.part_offset = start * 512;
+	mmc_part_dev.part_size = count * 512;
+	mmc_part_dev.bdif->ph_bcnt =
+		mmc_part_dev.part_size / mmc_part_dev.bdif->ph_bsize;
 }
 /******************************************************************************/

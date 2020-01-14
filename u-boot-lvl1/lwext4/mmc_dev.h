@@ -36,5 +36,7 @@
 
 /**@brief   File blockdev get.*/
 struct ext4_blockdev *mmc_dev_get(void);
+struct ext4_blockdev *mmc_part_dev_get(void);
+void mmc_part_dev_setpart(uint32_t start, uint32_t count);
 
 #endif /* FILE_DEV_H_ */
