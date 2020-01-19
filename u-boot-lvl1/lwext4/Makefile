@@ -1,6 +1,6 @@
 CC      = arm-eabi-gcc
 AR      = arm-eabi-ar
-CFLAGS := -g -march=armv8-a -mtune=cortex-a53  -DGCC -falign-functions=16 -fno-common -falign-jumps=8 -falign-loops=8 -fomit-frame-pointer -funroll-loops
+CFLAGS := -g  -mtune=cortex-a53  -DGCC -falign-functions=16 -fno-common -falign-jumps=8 -falign-loops=8 -fomit-frame-pointer -funroll-loops
 
 SRCS = $(wildcard ext4*.c)
 c_objs = $(filter %.o,$(patsubst %.c,%.o,$(SRCS)))

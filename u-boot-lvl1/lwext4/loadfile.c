@@ -20,6 +20,13 @@ typedef struct part_entry
 	uint32_t lba_size;
 } part_entry;
 
+struct bootblock
+{
+	uint8_t mbrcode[446];
+	part_entry parts[4];
+	uint8_t sig[2];
+} __packed;
+
 uint32_t mmc_bread(uint32_t start, uint32_t blkcnt,void *dst);
 
 static int read_to_addr(ext4_file *bootfile, void *addr)
@@ -49,14 +56,14 @@ static int read_to_addr(ext4_file *bootfile, void *addr)
 
 int try_partition(void *addr)
 {
-	uint8_t bootblock[512];
+	struct bootblock sect0;
 	ext4_file bootfile;
 	int r;
 
-	mmc_bread(0, 1, bootblock);
+	mmc_bread(0, 1, &sect0);
 
 	// check MBR signature
-	if (bootblock[510] != 0x55 || bootblock[511] != 0xaa)
+	if (sect0.sig[0] != 0x55 || sect0.sig[1] != 0xaa)
 		return 0;
 
 	struct ext4_blockdev *ext4dev = mmc_part_dev_get();
@@ -69,10 +76,10 @@ int try_partition(void *addr)
 	// check each partition
 	// we're going to find the first available Linux partition
 	for (size_t i = 0; i < 4; i++) {
-		part_entry *part = (part_entry*)(&bootblock[446 + i * 16]);
-		if (part->part_type == 0x83) {
+		if (sect0.parts[i].part_type == 0x83) {
 			// mount the partition and find u-boot.bin
-			mmc_part_dev_setpart(part->lba_first, part->lba_size);
+			mmc_part_dev_setpart(sect0.parts[i].lba_first,
+					sect0.parts[i].lba_size);
 			r = ext4_mount("mmcpart", "/", true /* read only */);
 			if (r != EOK) {
 #ifdef  UART
