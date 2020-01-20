@@ -33,5 +33,7 @@ c
 set elf load-segments-at-p_paddr on
 
 // sd init
+sudo fdisk -l
+sudo umount /dev/
 sudo mkfs.ext4 -O ^metadata_csum /dev/sdc
 sudo dumpe2fs /dev/sdb |less

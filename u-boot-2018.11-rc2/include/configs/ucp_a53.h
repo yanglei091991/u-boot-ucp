@@ -154,8 +154,8 @@
 
 // spi-nandflash cmd 
 #define UCPBOOT_NANDFLASH_CMD \
-    "ext4load mmc 0 0x41000000 uImage; " \
-    "ext4load mmc 0 0x50000000 ucp.dtb; " \
+    "ext4load mmc 0:1 0x41000000 uImage; " \
+    "ext4load mmc 0:1 0x50000000 ucp.dtb; " \
     "ydevconfig / spi-nand0 0x80 0x180; " \
     "ymount /; " \
     "ywrm uImage 0x41000000 0x7ae398; " \
@@ -165,11 +165,11 @@
     "bootm 0x10000000 - 0x18000000"
 // sd card ext4 file system
 #define UCPBOOT_SDCARD_EXT4CMD \
-    "ext4load mmc 0 0x10000000 uImage; " \
-    "ext4load mmc 0 0x18000000 ucp.dtb; " \
+    "ext4load mmc 0:1 0x10000000 uImage; " \
+    "ext4load mmc 0:1 0x18000000 ucp.dtb; " \
     "bootm 0x10000000 - 0x18000000"
 
-#define CONFIG_BOOTCOMMAND UCPBOOT_NANDFLASH_CMD
+#define CONFIG_BOOTCOMMAND UCPBOOT_SDCARD_EXT4CMD
 //#define CONFIG_NR_DRAM_BANKS		1
 
 //#define CONFIG_FS_EXT4
