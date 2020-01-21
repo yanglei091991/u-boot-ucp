@@ -6,9 +6,9 @@ OBJCOPY = arm-eabi-objcopy
 OBJDUMP = arm-eabi-objdump
 
 CFLAGS 	  := -g -march=armv8-a -mtune=cortex-a53  -DGCC -falign-functions=16 -fno-common -falign-jumps=8 -falign-loops=8 -fomit-frame-pointer -funroll-loops -Os
-CFLAGS    += -DUART
-CFLAGS 	  += -DSYS_CLK_50M
-#CFLAGS    += -DSOC_PLL_CFG -DSOC_CLK_CFG
+#CFLAGS   += -DUART
+#CFLAGS   += -DSYS_CLK_50M
+CFLAGS    += -DSOC_PLL_CFG -DSOC_CLK_CFG
 ASFLAGS   := -g -march=armv8-a
 
 SRCS = $(wildcard *.s *.c)
@@ -31,5 +31,5 @@ lwext4/boot_mmc_ext4.a: lwext4
 	make -C lwext4 boot_mmc_ext4.a
 
 clean:
-	rm -f *.o *.bin *.elf *.dis *.ihex
+	rm -f *.o *.bin *.elf *.dis *.ihex *.hex
 	make -C lwext4 clean
