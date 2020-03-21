@@ -3,13 +3,12 @@
 #include <stdio.h>
 #include "mmc_dev.h"
 
-#ifdef  UART
 #include "../uart.h"
-#endif
+
 
 #define BUFSZ 4096
 #define SM3_END_ADDR 0x04f60000
-
+extern unsigned int gPrtFlg;
 typedef struct part_entry
 {
 	uint8_t sts;
@@ -25,7 +24,7 @@ struct bootblock
 	uint8_t mbrcode[446];
 	part_entry parts[4];
 	uint8_t sig[2];
-} __packed;
+} __attribute__((packed));
 
 uint32_t mmc_bread(uint32_t start, uint32_t blkcnt,void *dst);
 
@@ -37,18 +36,20 @@ static int read_to_addr(ext4_file *bootfile, void *addr)
 	while (size) {
 		r = ext4_fread(bootfile, addr, BUFSZ, &size);
 		if (r != EOK) {
-#ifdef  UART
-            Uart_Printf("error: ext4 fread u-boot.bin fail! \n\r");
-#endif
+           if(gPrtFlg)
+           {
+             Uart_Printf("error: ext4 fread u-boot.bin fail! \n\r");
+           }
             return false;
         }
 		addr += size;
         if((int)addr >= (int)SM3_END_ADDR)
         {
-#ifdef  UART
+          if(gPrtFlg)
+          {
             Uart_Printf("error: u-boot.bin file more than 1M! \n\r");
-#endif
-            return false;
+          }
+          return false;
         }
 	}
 	return true;
@@ -68,10 +69,10 @@ int try_partition(void *addr)
 
 	struct ext4_blockdev *ext4dev = mmc_part_dev_get();
 	if (ext4_device_register(ext4dev, "mmcpart") != EOK) {
-#ifdef  UART
-       Uart_Printf("error: ext4 partition device register fail! \n\r");
-#endif
-       return false;
+    if (gPrtFlg)
+      Uart_Printf("error: ext4 partition device register fail! \n\r");
+
+    return false;
 	}
 	// check each partition
 	// we're going to find the first available Linux partition
@@ -82,23 +83,23 @@ int try_partition(void *addr)
 					sect0.parts[i].lba_size);
 			r = ext4_mount("mmcpart", "/", true /* read only */);
 			if (r != EOK) {
-#ifdef  UART
-				Uart_Printf("error: mount mmc partition fail! \n\r");
-#endif
-				continue;
+            if(gPrtFlg)
+			   Uart_Printf("error: mount mmc partition fail! \n\r");
+
+			continue;
 			}
 			r = ext4_fopen2(&bootfile, "/u-boot.bin", O_RDONLY);
 			if (r != EOK) {
-#ifdef  UART
-				Uart_Printf("error: open u-boot.bin in partition fail! \n\r");
-#endif
+                if(gPrtFlg)
+				  Uart_Printf("error: open u-boot.bin in partition fail! \n\r");
+
 				ext4_umount("/");
 				continue;
 			}
 			if (!read_to_addr(&bootfile, addr)) {
-#ifdef  UART
-				Uart_Printf("error: load u-boot.bin error!\n\r");
-#endif
+                if(gPrtFlg)
+				  Uart_Printf("error: load u-boot.bin error!\n\r");
+
 				ext4_fclose(&bootfile);
 				ext4_umount("/");
 				continue;
@@ -122,25 +123,25 @@ int loadfile(void *addr)
 
 	r = ext4_device_register(blk, "mmc");
 	if (r != EOK) {
-#ifdef  UART
-       Uart_Printf("error: ext4 device register fail! \n\r");
-#endif
+       if(gPrtFlg)
+         Uart_Printf("error: ext4 device register fail! \n\r");
+
        return false;
 	}
 
 	r = ext4_mount("mmc", "/", true /* read only */);
 	if (r != EOK) {
-#ifdef  UART
-       Uart_Printf("error: ext4 mount ""/"" fail! \n\r");
-#endif
+       if(gPrtFlg)
+         Uart_Printf("error: ext4 mount ""/"" fail! \n\r");
+
        return false;
     }
 
 	r = ext4_fopen2(&bootfile, "/u-boot.bin", O_RDONLY);
 	if (r != EOK) {
-#ifdef  UART
-        Uart_Printf("error: ext4 open u-boot.bin fail! \n\r");
-#endif
+        if(gPrtFlg)
+          Uart_Printf("error: ext4 open u-boot.bin fail! \n\r");
+
         return false;
     }
 

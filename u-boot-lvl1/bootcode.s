@@ -134,9 +134,9 @@ cpu_start:
                 ldr r0, =SM5_START_ADDR // 128KB 0x020c0000
 				ldr r1, =SM5_END_ADDR   // 0x020e0000
                 bl copy_loop
-                ldr r0, =SM4_START_ADDR // 64KB 0x047d0000
-				ldr r1, =SM4_END_ADDR   // 0x047e0000
-                bl copy_loop
+                //ldr r0, =SM4_START_ADDR // 64KB 0x047d0000
+				//ldr r1, =SM4_END_ADDR   // 0x047e0000
+                //bl copy_loop
                 ldr r0, =SM03_START_ADDR // 1M 0x04e60000
 				ldr r1, =SM03_END_ADDR   // 0x04f60000
                 bl copy_loop

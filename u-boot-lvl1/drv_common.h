@@ -5,6 +5,8 @@
 extern unsigned int gSysClk;
 extern unsigned int gSpiClk;
 extern unsigned int gUART0_BAUDRATE;
-extern unsigned int gSdioClk;
+extern unsigned int gSdMaxClk;
+extern unsigned int gSdioClkin;
+
 
 #endif // _DRV_COMMON_H

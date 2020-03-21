@@ -5,28 +5,31 @@
 #include "sd_common.h"
 #include "boot_read_mode.h"
 #include "pinmux.h"
-
-#ifdef  UART
 #include "uart.h"
-#endif
+
 
 #ifdef SOC_CLK_CFG
    /* soc config clk */
    unsigned int gSysClk = 100000000;     /* 100MHz */
    unsigned int gUART0_BAUDRATE = 115200;
    unsigned int gSpiClk = 1000000;       /* 1MHz */
-   unsigned int gSdioClk = 10000000;     /* 10MHz */
+   unsigned int gSdMaxClk =   5000000;   /* 5MHz, SD card max clk */
+   unsigned int gSdioClkin = 50000000;   /* 50MHz, sdio clkin clk */
 #else
 #if SYS_CLK_50M 
-   unsigned int gSysClk = 50000000;      /* 50MHz */
+   /* FPGA check board clk config--50MHz */
+   unsigned int gSysClk = 50000000;       /* 50MHz */
    unsigned int gUART0_BAUDRATE =115200;
    unsigned int gSpiClk = 250000;
-   unsigned int gSdioClk = 10000000;     /* 10MHz, actually 50/6=8.33M */
+   unsigned int gSdMaxClk =  10000000;   /* 10MHz, actually 50/6=8.33M */
+   unsigned int gSdioClkin = 50000000;   /* 50MHz, sdio clkin clk */ 
 #else
-   unsigned int gSysClk = 10000000;     /* 10MHz */
+   /* FPGA check board clk config--10MHz */
+   unsigned int gSysClk = 10000000;      /* 10MHz */
    unsigned int gUART0_BAUDRATE =19200;
    unsigned int gSpiClk = 100000;
-   unsigned int gSdioClk = 2500000;    /* 2.5MHz */
+   unsigned int gSdMaxClk =   2500000;   /* 2.5MHz */
+   unsigned int gSdioClkin = 10000000;   /* 10MHz, sdio clkin clk */ 
 #endif
 #endif
 
@@ -63,7 +66,8 @@ void  xtal_clk_cfg(void)
     gSysClk =10000000;       /* 10MHz */
 	gUART0_BAUDRATE =19200;
 	gSpiClk = 100000;        /* 100K */
-	gSdioClk = 2500000;
+	gSdMaxClk  = 2500000;    /* 2.5M */
+	gSdioClkin = 10000000;    /* 10M */
 	
     /* PLL1/PLL3 used xtal clock */
     //PLL_SEL_CTRL &= (~0x500);
@@ -73,10 +77,18 @@ unsigned int config_pll(void)
 {
     unsigned int count=0;
 
-    SRIOCLK_CTRL |= (1<<13);    
+    PLL1_CTRL &= (~1);
+    PLL3_CTRL &= (~1);
+    SDIO_TUNING = 0xC000;	
+    SRIOCLK_CTRL |= (1<<13);
+    RFC_TUNINGCLK_CTRL = 1 + (3<<13);  /* 250 */
+    DMAS0CLK_CTRL = (3<<13)+ 1;
+    DMAS1CLK_CTRL = (3<<13)+ 1;
+	DMA0CLK_CTRL  = (3<<13)+ 1;
+    
     // config pll clock_t
     PLL1_CONFIG0 = (3 << 12) + (1 << 15) + 120;  /* 800MHz */
-    PLL3_CONFIG0 = (3 << 12) + (1 << 15) + 150;  /* 1000MHz */
+    PLL3_CONFIG0 = (5 << 12) + (1 << 15) + 150;  /* 1000MHz */
     // pll1 enable,bus
     PLL1_CTRL |= 1;
     // PLL3 enable, A53
@@ -101,8 +113,8 @@ unsigned int config_pll(void)
     PLL_SEL_CTRL |= 0x100;
     // clear status
     PLL_SEL_CTRL = PLL_SEL_CTRL & (~BIT16);
-    // enable sdio clk to 100M
-    SDIOCLK_CTRL = 1 + (9 << 13) + BIT18; /* 100MHz */
+    // enable sdio clk to 50M
+    SDIOCLK_CTRL = 1 + (19 << 13) + BIT18; /* 50MHz,2020-0209 */
 
     return true;
 }
@@ -126,9 +138,7 @@ int main()
       xtal_clk_cfg();
 #endif
 
-#ifdef  UART
-  boot_uart_init();
-#endif  
+  boot_uart_init();  
 
   if(read_uboot_mode() == false) return 1;
  

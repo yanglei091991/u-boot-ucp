@@ -6,9 +6,9 @@
 #include "spi_nand_flash.h"
 #include "crc32.h"
 
-#ifdef UART
+
 #include "uart.h"
-#endif
+
 
 enum{
 uboot_page = 0x4,

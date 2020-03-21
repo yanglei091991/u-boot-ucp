@@ -17,6 +17,11 @@
 #define PLL_SEL_CTRL    (*((volatile uint32_t *) (CRG_BASE_ADDR + 0x14*4)))
 #define SDIOCLK_CTRL    (*((volatile uint32_t *) (CRG_BASE_ADDR + 0x5c*4)))
 #define SRIOCLK_CTRL    (*((volatile uint32_t *) (CRG_BASE_ADDR + 0x73*4)))
+#define RFC_TUNINGCLK_CTRL     (*((volatile uint32_t *)(CRG_BASE_ADDR + 0x63*4)))
+
+#define DMA0CLK_CTRL           (*((volatile uint32_t *)(CRG_BASE_ADDR + 0x6B*4)))
+#define DMAS0CLK_CTRL          (*((volatile uint32_t *)(CRG_BASE_ADDR + 0x2f*4)))
+#define DMAS1CLK_CTRL          (*((volatile uint32_t *)(CRG_BASE_ADDR + 0x30*4)))
 
 #define APHCLK_CTRL            (*((volatile uint32_t *)(CRG_BASE_ADDR + 0x28*4)))
 #define CPHCLK_CTRL            (*((volatile uint32_t *)(CRG_BASE_ADDR + 0x29*4)))

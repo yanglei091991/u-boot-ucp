@@ -10,7 +10,8 @@
 
 #define	 DWMMC_MAX_FREQ			10000000   /* 10M */
 #define	 DWMMC_MIN_FREQ			  400000   /* 400k */
-#define	 DWMMC_CLOCK			gSysClk
+//#define	 DWMMC_CLOCK			gSysClk
+#define	 DWMMC_CLOCK			gSdioClkin
 
 struct mmc ucp_mmc;
 struct dwmci_host ucp_host;
@@ -163,7 +164,7 @@ int sd_init(void)
 	host->dev_index = 0;
     
 	/* Add the mmc channel to be registered with mmc core */
-	if (add_dwmci(host, gSdioClk, DWMMC_MIN_FREQ)) 
+	if (add_dwmci(host, gSdMaxClk, DWMMC_MIN_FREQ)) 
 		return false;
     ucp_mmc.dsr_imp		= 0;
     ucp_mmc.dsr			= 0xffffffff;

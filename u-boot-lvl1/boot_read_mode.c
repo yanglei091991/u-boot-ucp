@@ -3,9 +3,10 @@
 #include "spi_nandflash_common.h"
 #include "pinmux.h"
 
-#ifdef  UART
+
 #include "uart.h"
-#endif
+
+unsigned int gPrtFlg=0;      /* UART print flag, off=0, on=1 */
 
 #ifdef  UART
 void  print_boot_cfg(void)
@@ -38,38 +39,41 @@ unsigned char  read_uboot_mode(void)
     unsigned int  boot_cfg;
     unsigned int *src = (unsigned int*)nandflash_startAddr;
     unsigned char *dest = (unsigned char*)copy_addr;
-
+   
 #ifdef  UART
     print_boot_cfg();
 #endif    
-    boot_cfg = A53_M3_REMAP;    
+    boot_cfg = A53_M3_REMAP;
+    if((boot_cfg&(BOOT_CTL_SYNC5|BOOT_CFG_SYNC)) == BOOT_CTL_SYNC5)
+    {
+       gPrtFlg= 0x5a5a5a5a;
+    }    
+    
     if(boot_cfg&BOOT_CTL_SYNC4)
     { /* uboot from SPI0 nand flash */
     
       /* SOC use spio0, spi0 must be pinmux init; */
       spi0_pin_init();
-          
+      
 #ifdef  UART   
       Uart_Printf("U-BOOT from SPI nand! \n\r");
 #endif    
 
       /* init spi and read spi flash id */
       if(spi_nand_flash_init() == false)
-      {
-#ifdef  UART   
-        Uart_Printf("SPI flash id error! \n\r");
-#endif        
-        return false;          
+      { 
+        if(gPrtFlg)
+          Uart_Printf("SPI flash id error! \n\r");       
+        //return false;          
       }
       
       /* read uboot from spi flash */
 	  if(copy_boot2_to_ram(src,dest) == false)
-      {
-#ifdef  UART   
-          Uart_Printf("BOOT1 copy U-BOOT from SPI flash Failed! \n\r");
-#endif        
+      { 
+        if(gPrtFlg)
+          Uart_Printf("BOOT1 copy U-BOOT from SPI flash Failed! \n\r");        
         return false;  
-      }
+      } 	  
 
 #ifdef  UART   
           Uart_Printf("BOOT1 copy U-BOOT from SPI flash ok! \n\r");
@@ -84,9 +88,8 @@ unsigned char  read_uboot_mode(void)
         /* init sdio, read uboot from sd card */     
        if(sd_fs_read() == false)
        { 
-#ifdef  UART   
-          Uart_Printf("BOOT1 copy U-BOOT from SD Failed! \n\r");
-#endif        
+        if(gPrtFlg)   
+          Uart_Printf("BOOT1 copy U-BOOT from SD Failed! \n\r");       
         return false;  
        }
 #ifdef  UART   

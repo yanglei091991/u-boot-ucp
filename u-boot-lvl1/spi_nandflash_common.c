@@ -1,5 +1,6 @@
 #include "spi_nandflash_common.h"
 
+extern unsigned int gPrtFlg;
 int read_arr_index = 0;
 unsigned char (* nandflash_read_arr[])(unsigned int,unsigned int,unsigned char*,unsigned int) = {nandflash_read};
 
@@ -12,9 +13,9 @@ bool copy_boot2_to_ram(unsigned int *src, unsigned char *dest)
 //  unsigned int len = 0x800; // 2k
   if(nandflash_read_arr[read_arr_index](rowAddr, colAddr, SM5_Addr, sizeof(SM5_Addr)) != 0)
   {
-#ifdef UART
+   if(gPrtFlg)
       Uart_Printf("error: spi read u-boot header from nandflash fail! \n\r");
-#endif 
+ 
       return false;
   }
 
@@ -31,17 +32,17 @@ bool copy_boot2_to_ram(unsigned int *src, unsigned char *dest)
 
   if(nand_head.op_type != boot2)
   {
-#ifdef UART
+    if(gPrtFlg)
       Uart_Printf("error: spi read header file not u-boot from nandflash! \n\r");
-#endif 
+ 
     return false;
   }
 
   if(nand_head.byte_size >= 0x100000)
   {
-#ifdef  UART
+     if(gPrtFlg)
         Uart_Printf("error: u-boot.bin file more than 1M! \n\r");
-#endif
+
         return false;
   }
 
@@ -55,9 +56,9 @@ bool copy_boot2_to_ram(unsigned int *src, unsigned char *dest)
     colAddr = 0x0;
     if(nandflash_read_arr[read_arr_index](rowAddr, colAddr, tmp_dest, Block_Size) != 0)
     {
-#ifdef UART
+      if(gPrtFlg)
         Uart_Printf("error: spi read a block of u-boot from nandflash fail! \n\r");
-#endif
+
         return false;
     }
     tmp_dest = tmp_dest + Block_Size;
@@ -70,9 +71,9 @@ bool copy_boot2_to_ram(unsigned int *src, unsigned char *dest)
     colAddr = 0x0;
     if(nandflash_read_arr[read_arr_index](rowAddr, colAddr, tmp_dest, nand_head.byte_size%Block_Size) != 0)
     {
-#ifdef UART    
+      if(gPrtFlg)    
         Uart_Printf("error: spi read remainder block of u-boot from nandflash fail! \n\r");
-#endif
+
         return false;
     }
   }
@@ -80,9 +81,9 @@ bool copy_boot2_to_ram(unsigned int *src, unsigned char *dest)
   unsigned int dest_file_crc = crc32(dest, nand_head.byte_size);
   if(nand_head.crc != dest_file_crc)
   {
-#ifdef UART    
+     if(gPrtFlg)    
         Uart_Printf("error: spi read u-boot from nandflash crc32 fail! \n\r");
-#endif
+
     return false;
   }
   return true;

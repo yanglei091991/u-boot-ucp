@@ -19,6 +19,8 @@
 #define A53_CNTCLKEN           (*((volatile unsigned int *)(SYSCFG_BASE_ADDR + 0x0d*4)))
 #define GIC400_USER            (*((volatile unsigned int *)(SYSCFG_BASE_ADDR + 0x0e*4)))
 #define GPMC_CFG               (*((volatile unsigned int *)(SYSCFG_BASE_ADDR + 0x0f*4)))
+#define SDIO_TUNING            (*((volatile unsigned int *)(SYSCFG_BASE_ADDR + 0x14*4)))
+
 
 #define     BIT0                    (0x1<<0ul)
 #define     BIT1                    (0x1<<1ul)
@@ -55,9 +57,12 @@
 
 /* 一级boot-- 0:BOOT_ROM方式启动, 1:GPMC 方式启动（FLASH/SRAM）*/
 #define  BOOT_CFG_SYNC    BIT3   
+
 /* 二级boot--0:系统从SDIO启动, 1:系统从SPI0启动 */
 #define  BOOT_CTL_SYNC4   BIT4
+
 /* boot_cfg_sync=1时：控制GPMC的boot媒介, 0：async SRAM,  1:  nor Flash  */
+/* boot_cfg_sync=0时：1-print on, 0-print off */
 #define  BOOT_CTL_SYNC5   BIT5
 
 #define IS_ROM_BOOT    0  
